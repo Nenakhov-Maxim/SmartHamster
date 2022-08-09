@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Alarma ToDo</title>  
+  <link rel="stylesheet" href="normalize.css">
+  <link rel="stylesheet" href="style.css">
+  <script type="text/javascript" src="/eel.js"></script>
+</head>
+<body>
+  <div class="container">
+    <section class="box-nav">
+      <div class="name-worker">
+        <div class="nav-logo">
+          <img src="icon/logo.png" alt="logo">
+        </div>
+        <div class="nav-persona">
+          <div class="name">Maxim Nenakhov</div>
+          <div class="email">Nenakhov.Max@yandex.ru</div>
+        </div>
+      </div>
+      <div class="nav-search">
+        <div class="search__container">          
+          <input class="search__input" type="text" placeholder="Search">
+        </div>
+      </div>
+      <div class="group-task">
+        <div class="group-task-myday">Мой день</div>
+        <div class="group-task-important">Важно</div>
+        <div class="group-task-planning">Запланировано</div>
+        <div class="group-task-assigned-to-me">Назначен мне</div>
+        <div class="group-task-all-task">Контроль исполнения</div>
+      </div>
+      <div class="list-task-container">
+        <div class="list-task">Свой список</div>
+        <div class="new-task">Создать список</div>
+      </div>      
+    </section>
+    <section class="box-task">
+      <div class="box-task-nav">
+        <h1 class="title">
+          Задачи
+        </h1>
+        <div class="popup-menu">
+          ...
+        </div>
+      </div>
+      <div class="tasks-container">                          
+      </div>
+      <div class="completed-task">
+        <h2>Завершенные</h2>
+        <div class="completed-task-inner">         
+        </div>        
+      </div>
+      <input type="text" class="add-task" id="search" name="search" onfocus="inputFocus(this)" onblur="inputBlur(this)" placeholder="Новая задача" />
+      <!-- Модальное окно 
+      <a class="btn-modal" href="#modal-block">Открыть</a>-->
+      <!-- Содержимое модального окна -->
+      <div class="modal-block">        
+        <div class="modal-inner">
+          <div class="modal-title">
+            <h3>Настройки задачи</h3>
+            <a class="close-block" href="#">X</a>
+          </div>          
+          <div class="modal-info">
+            <div class="modal-text-task">
+              <p>Полный текст задачи:</p>
+              <textarea class="modal-text" resize="none"></textarea>
+            </div>
+            <div class="modal-container">
+              <div class="modal-date-task">
+                <div class="modal-date">
+                  <label for="date-start">Задача создана:</label>
+                  <input type="date" class="modal-date-start" name="date-start"/>
+                </div>
+                <div class="modal-date">
+                  <label for="date-end">Дата выполнения:</label>
+                  <input type="date" class="modal-date-end" name="date-end"/>
+                </div>              
+              </div>
+              <div class="modal-option-task">
+                <div class="modal-option">
+                  <label for="option-assign">Выполняющий:</label>
+                  <input type="text" name="option-assign">
+                </div>
+                <div class="modal-option">
+                  <label for="option-to-assign">Кому назначено:</label>
+                  <input type="text" name="option-to-assign">
+                </div>
+                <div class="modal-option">
+                  <label for="option-select-type">Тип задачи?</label>
+                  <select class="modal-option-select" name="option-select-type">
+                    <option>Пункт 1</option>
+                    <option>Пункт 2</option>                
+                  </select>    
+                  </div> 
+              </div>
+            </div>            
+            <div class="modal-suboption-task">
+              <fieldset>
+                <legend>Дополнительные настройки</legend>            
+                <div class="modal-suboption">
+                  <input type="checkbox" class="modal-task-checkbox horn" name="horn">
+                  <label for="horn">Установить напоминание?</label>
+                </div>
+                <div class="modal-suboption">
+                  <input type="checkbox" class="modal-task-checkbox repeat" name="repeat">
+                  <label for="repeat">Задать цикличность?</label>
+                </div>             
+                <div class="modal-suboption">
+                  <input type="checkbox" class="modal-task-checkbox assign" name="assign">
+                  <label for="assign">Назначить другого ответственного?</label>
+                </div>               
+              </fieldset>
+            </div>
+            <button class="modal-task-accept">Применить</button>
+          </div>
+          
+        </div>      
+      </div>
+    </section>
+  </div>
+  <script src="index.js"></script>  
+</body>
+</html>

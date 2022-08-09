@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="96" height="96"><rect id="backgroundrect" width="100%" height="100%" x="0" y="0" fill="none" stroke="none"/>
+  <defs>
+    <clipPath id="clip-file">
+      <rect width="96" height="96" id="svg_1"/>
+    </clipPath>
+  </defs>
+  
+<g class="currentLayer" style=""><title>Layer 1</title><g id="file" clip-path="url(#clip-file)" class="selected" stroke="#ffffff" stroke-opacity="1">
+    <g id="pills" stroke="#ffffff" stroke-opacity="1">
+      <g id="Group_160" data-name="Group 160" stroke="#ffffff" stroke-opacity="1">
+        <path id="Path_191" data-name="Path 191" d="M10,84V12a8,8,0,0,1,8-8H62.563A8.3,8.3,0,0,1,68.43,6.43L83.57,21.57A8.3,8.3,0,0,1,86,27.437V84a8,8,0,0,1-8,8H18A8,8,0,0,1,10,84Z" fill="none" stroke="#ffffff" stroke-linecap="round" stroke-miterlimit="10" stroke-width="4" stroke-opacity="1"/>
+        <path id="Path_192" data-name="Path 192" d="M64,5V17a8,8,0,0,0,8,8H84" fill="none" stroke="#ffffff" stroke-linecap="round" stroke-miterlimit="10" stroke-width="4" stroke-opacity="1"/>
+        <g id="Group_159" data-name="Group 159" stroke="#ffffff" stroke-opacity="1">
+          <line id="Line_26" data-name="Line 26" x2="69" fill="none" stroke="#ffffff" stroke-linecap="round" stroke-miterlimit="10" stroke-width="4" y2="46" y1="46" x1="27"/>
+          <line id="Line_27" data-name="Line 27" x2="69" fill="none" stroke="#ffffff" stroke-linecap="round" stroke-miterlimit="10" stroke-width="4" y2="69" y1="69" x1="27"/>
+        </g>
+      </g>
+    </g>
+  </g></g></svg>
