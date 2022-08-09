@@ -9,7 +9,7 @@ let planning = document.getElementsByClassName('group-task-planning')[0];
 let assignedToMe = document.getElementsByClassName('group-task-assigned-to-me')[0];
 let allTask = document.getElementsByClassName('group-task-all-task')[0];
 let title = document.getElementsByClassName('title')[0]
-
+let applyOptionsButton = document.getElementsByClassName('modal-task-accept')[0];
 
 inputBlock.addEventListener('keypress', AddTaskToScreen);
 myDay.addEventListener('click', () =>  {
@@ -131,17 +131,14 @@ function toggleTaskOptions(self, event) {
   btn_close.addEventListener('click', ()=> {
     modal.classList.remove('modal-active');
   })
-  //modal_inner.childNodes[3].innerHTML = 'Текст задачи: ' + self.path[0].innerHTML;
 }
 
-/*document.addEventListener('click', (e)=> {  
+applyOptionsButton.addEventListener('click', (e) => {
   modal = document.querySelector('.modal-block');
-  modal_active = document.querySelector('.modal-active');
-  console.log(modal_active)
-  if (modal != (e.target) && modal_active != null) {
-    console.log('Зашел!')
-    modal.classList.remove('modal-active');
-  }
-})*/
+  e.preventDefault();
+  console.log('изменения приняты')
+  modal.classList.remove('modal-active');
+})
+
 
 start_app()
