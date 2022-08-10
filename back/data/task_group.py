@@ -11,5 +11,5 @@ class Taskgroup(Base):
 
 
     def __repr__(self):
-        return f'Группа: {self.group_name}, id: {self.id}'
+        return f'{self.group_name}'
 

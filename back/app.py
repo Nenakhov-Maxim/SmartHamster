@@ -55,6 +55,13 @@ class StartApp:
             result.append(str(it).split('/'))
         return result
 
+    def get_groups(self):
+        result = []
+        for it in self.session.query(Taskgroup):
+            result.append(str(it))
+        return result    
+
+
 
 # if __name__ == '__main__':
 #     app = StartApp()

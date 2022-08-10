@@ -33,14 +33,17 @@ function AddTaskToScreen(e){
   if (e.key === 'Enter'){
     if (inputBlock.value!=''){
       let inputValue = inputBlock.value;
-      let div = document.createElement('div');
+      /*Думать дальше как решить ;(*/
+      /*let div = document.createElement('div');
       div.className = "task";      
       div.innerHTML = `<img src="icon/circle.svg" alt="выполнено" onclick="completeTask(this)"><p class='task-text'>${inputValue}</p>`;
       blockTask.append(div);
-      div.childNodes[1].addEventListener('click', toggleTaskOptions) 
+      div.childNodes[1].addEventListener('click', toggleTaskOptions)*/ 
       document.activeElement.blur();
-      inputBlock.value = '';      
-      add_to_database(inputValue)
+      inputBlock.value = '';    
+      add_to_database(inputValue);
+     /* window.location.reload(); Хрень получается!*/
+      
     }
     else {
       alert('Что все-таки ввести придется ;)')
@@ -91,26 +94,38 @@ async function start_app(){
 }
 
 function add_task_db(value) {
-  for (let i = 0; i < value.length; i++) {
-    let element = value[i][9];
+  for (let i = 0; i < value.length; i++) {    
+    let text_element = value[i][9];
     let div = document.createElement('div');
     div.className = "task";
-    div.innerHTML = `<img src="icon/circle.svg" alt="выполнено" onclick="completeTask(this)"><p class='task-text'>${element}</p>`;
+    div.innerHTML = `<img src="icon/circle.svg" alt="выполнено" onclick="completeTask(this)"><p class='task-text'>${text_element.slice(0, 20)}...</p>`;
+    div.setAttribute('data-task-text', (value[i][9] != 'None') ? value[i][9] : " ")
+    div.setAttribute('data-task-id', (value[i][0] != 'None') ? value[i][0] : " ");    
+    div.setAttribute('data-creation-date', (value[i][7] != 'None') ? value[i][7] : "");
+    div.setAttribute('data-completion-date', (value[i][8] != 'None') ? value[i][8] : ""); 
+    div.setAttribute('data-status', (value[i][10] != 'None') ? value[i][10] : " ");
+    div.setAttribute('data-visibillity', (value[i][11] != 'None') ? value[i][11] : " ");
+    div.setAttribute('data-who-appointed', (value[i][12] != 'None') ? value[i][12] : " ");
+    div.setAttribute('data-whom-is-assigned', (value[i][13] != 'None') ? value[i][13] : " ");
+    div.setAttribute('data-task-group', (value[i][14] != 'None') ? value[i][14] : " ");    
     blockTask.append(div);
     div.childNodes[1].addEventListener('click', toggleTaskOptions)            
   }  
   
 }
 
-async function add_to_database(text){
-  console.log('Шаг 1')
+async function add_to_database(text){  
   value = await eel.add_to_db(text)();
-  if (value ===  true) {
-    console.log('Шаг 2')
+  if (value ===  true) {    
     console.log('Добавление прошло успешно')
   } else {
     console.log('Что-то пошло не так')
   }
+}
+
+async function get_data_by_groups(){  
+  groups = await eel.get_groups()();  
+  return groups
 }
 
 function log_up(user_name) {
@@ -123,14 +138,39 @@ function email_up(email) {
   name.innerHTML = email
 }
 
-function toggleTaskOptions(self, event) {
+function toggleTaskOptions(self, event) {  
   modal = document.querySelector('.modal-block');
-  btn_close = document.querySelector('.close-block');
-  modal_inner = document.querySelector('.modal-inner');
+  btn_close = document.querySelector('.close-block');  
   modal.classList.toggle('modal-active');
   btn_close.addEventListener('click', ()=> {
     modal.classList.remove('modal-active');
   })
+  /*формируем данные для блока опции*/  
+  let text = document.querySelector('textarea.modal-text');
+  text.value = self.path[0].parentElement.dataset.taskText; 
+  let dateStart = document.querySelector('input.modal-date-start');
+  dateStart.value = new Date(self.path[0].parentElement.dataset.creationDate).toISOString().split('T')[0];
+  let dateEnd = document.querySelector('input.modal-date-end');
+  dateEnd.value = (self.path[0].parentElement.dataset.completionDate != '') ? new Date(self.path[0].parentElement.dataset.completionDate).toISOString().split('T')[0]: '';
+  let whoAppointed = document.querySelector('input.option-assign');  
+  whoAppointed.value = (self.path[0].parentElement.dataset.whoAppointed != ' ')? self.path[0].parentElement.dataset.whoAppointed: 'Нет';
+  let whomIsAssigned = document.querySelector('input.option-to-assign');  
+  whomIsAssigned.value = (self.path[0].parentElement.dataset.whomIsAssigned != ' ') ? self.path[0].parentElement.dataset.whomIsAssigned: 'Нет';
+  get_data_by_groups().then(function(result) {  
+    let taskGroup = document.querySelector('select.modal-option-select');
+    taskGroup.innerHTML = ''
+    for (let i = 0; i < result.length; i++) {
+      const element = result[i];
+      let option = document.createElement('option');
+      if (element == self.path[0].parentElement.dataset.taskGroup){
+        option.setAttribute('selected', 'selected');
+      } else {
+        option.setAttribute('disabled', 'disabled');
+      }; 
+      option.innerHTML = element;
+      taskGroup.append(option);      
+    };
+  });
 }
 
 applyOptionsButton.addEventListener('click', (e) => {

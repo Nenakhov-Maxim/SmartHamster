@@ -11,9 +11,16 @@ def start_app():
         return ['Незарегистрированныйй пользователь', 'Неизвестный Email']
     else:
         tasks = app.get_tasks()
+        print(tasks)
         return user, tasks
 
 @eel.expose
 def add_to_db(text):
     result = app.add_task(1, text, 1)
+    return result
+
+@eel.expose
+def get_groups():
+    result = app.get_groups()
+    print(result)
     return result

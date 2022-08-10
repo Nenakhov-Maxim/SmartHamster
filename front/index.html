@@ -77,20 +77,20 @@
                 </div>
                 <div class="modal-date">
                   <label for="date-end">Дата выполнения:</label>
-                  <input type="date" class="modal-date-end" name="date-end"/>
+                  <input type="date" class="modal-date-end" name="date-end" readonly/>
                 </div>              
               </div>
               <div class="modal-option-task">
                 <div class="modal-option">
-                  <label for="option-assign">Выполняющий:</label>
-                  <input type="text" name="option-assign" readonly>
+                  <label for="option-assign">Кем назначено:</label>
+                  <input class="option-assign" type="text" name="option-assign" readonly>
                 </div>
                 <div class="modal-option">
                   <label for="option-to-assign">Кому назначено:</label>
-                  <input type="text" name="option-to-assign" readonly>
+                  <input class="option-to-assign" type="text" name="option-to-assign" readonly>
                 </div>
                 <div class="modal-option">
-                  <label for="option-select-type">Тип задачи?</label>
+                  <label for="option-select-type">Тип задачи:</label>
                   <select class="modal-option-select" name="option-select-type">
                     <option>Пункт 1</option>
                     <option>Пункт 2</option>                
@@ -117,7 +117,6 @@
             </div>
             <button class="modal-task-accept">Применить</button>
           </div>
-          
         </div>      
       </div>
     </section>
