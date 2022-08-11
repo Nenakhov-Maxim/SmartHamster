@@ -100,17 +100,25 @@
             </div>            
             <div class="modal-suboption-task">
               <fieldset>
-                <legend>Дополнительные настройки</legend>            
+                <legend>Дополнительные настройки</legend>
                 <div class="modal-suboption">
-                  <input type="checkbox" class="modal-task-checkbox horn" name="horn">
+                  <input type="checkbox" class="modal-task-checkbox horn" name="date" onclick="fieldset_change(this)">
+                  <label for="date">Задать дату выполнения?</label>
+                </div>    
+                <div class="modal-suboption">
+                  <input type="checkbox" class="modal-task-checkbox assign" name="type" onclick="fieldset_change(this)">
+                  <label for="type">Изменить/установить тип задачи?</label>
+                </div>          
+                <div class="modal-suboption">
+                  <input type="checkbox" class="modal-task-checkbox horn" name="horn" onclick="fieldset_change(this)">
                   <label for="horn">Установить напоминание?</label>
                 </div>
                 <div class="modal-suboption">
-                  <input type="checkbox" class="modal-task-checkbox repeat" name="repeat">
+                  <input type="checkbox" class="modal-task-checkbox repeat" name="repeat" onclick="fieldset_change(this)">
                   <label for="repeat">Задать цикличность?</label>
                 </div>             
                 <div class="modal-suboption">
-                  <input type="checkbox" class="modal-task-checkbox assign" name="assign">
+                  <input type="checkbox" class="modal-task-checkbox assign" name="assign" onclick="fieldset_change(this)">
                   <label for="assign">Назначить ответственного?</label>
                 </div>               
               </fieldset>

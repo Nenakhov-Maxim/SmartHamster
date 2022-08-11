@@ -68,10 +68,10 @@ def _load_data(session: Session):
     session.add(worker1)
     session.add(worker2)
     session.commit()
-    new_task1 = Task(worker_id=worker1.id, text_task='Сделать базу данных', creation_date=datetime.datetime.now(), task_group_id=task_gr10.id)
-    new_task2 = Task(worker_id=worker2.id, text_task='Другая задача', creation_date=datetime.datetime.now(),
-                    task_group_id=task_gr3.id)
-    session.add(new_task1)
-    session.add(new_task2)
+    # new_task1 = Task(worker_id=worker1.id, text_task='Сделать базу данных', creation_date=datetime.datetime.now(), task_group_id=task_gr10.id)
+    # new_task2 = Task(worker_id=worker2.id, text_task='Другая задача', creation_date=datetime.datetime.now(),
+    #                 task_group_id=task_gr3.id)
+    # session.add(new_task1)
+    # session.add(new_task2)
     session.commit()
     session.close()

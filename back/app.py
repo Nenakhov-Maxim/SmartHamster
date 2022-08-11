@@ -30,9 +30,9 @@ class StartApp:
         for it in self.session.query(Worker):
             return str(it).split('/')
 
-    def add_task(self, worker_id: int, text_task: str, status: int, visibility: bool = True, completion_date=None,
+    def add_task(self, worker_id: int, text_task: str, status: int = 2, visibility: bool = True, completion_date=None,
                  who_appointed: int = None,
-                 whom_is_assigned: int = None, task_group: int = None):
+                 whom_is_assigned: int = None, task_group: int = 10):
         new_task = Task(worker_id=worker_id, text_task=text_task, creation_date=datetime.datetime.now(), status=status,
                         visibility=visibility, completion_date=completion_date, who_appointed_id=who_appointed,
                         whom_is_assigned_id=whom_is_assigned,
@@ -59,7 +59,34 @@ class StartApp:
         result = []
         for it in self.session.query(Taskgroup):
             result.append(str(it))
-        return result    
+        return result
+
+    # Обновление данных
+    def updating_task_data(self, ID, creation_date, completion_date, text_task, who_appointed, whom_is_assigned, task_group):
+        for it in self.session.query(Worker).filter(Worker.surname == who_appointed.split(' ')[0]):
+            who_appointed = it.id
+            break
+        else:
+            who_appointed = None
+        for it in self.session.query(Worker).filter(Worker.surname == whom_is_assigned.split(' ')[0]):
+            whom_is_assigned = it.id
+            break
+        else:
+            whom_is_assigned = None
+        for it in self.session.query(Taskgroup).filter(Taskgroup.group_name == task_group):
+            task_group = it.id
+            break
+        if completion_date == '':
+            completion_date = None
+        else:
+            completion_date = datetime.datetime.strptime(completion_date, '%Y-%m-%d')
+        self.session.query(Task).filter(Task.id == ID).update({'creation_date': datetime.datetime.strptime(creation_date, '%Y-%m-%d'),
+                                                               'completion_date': completion_date,
+                                                               'text_task': text_task,
+                                                               'who_appointed_id': who_appointed,
+                                                               'whom_is_assigned_id': whom_is_assigned,
+                                                               'task_group_id': task_group})
+        self.session.commit()
 
 
 

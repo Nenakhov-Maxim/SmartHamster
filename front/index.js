@@ -1,6 +1,5 @@
-//Событие на нажатие кнопки новая задача
 
-//let newTask = document.getElementsByClassName('add-new-task')[0];
+//Определение базовых переменных
 let blockTask = document.getElementsByClassName('tasks-container')[0];
 let inputBlock = document.getElementsByClassName('add-task')[0];
 let myDay = document.getElementsByClassName('group-task-myday')[0];
@@ -11,6 +10,7 @@ let allTask = document.getElementsByClassName('group-task-all-task')[0];
 let title = document.getElementsByClassName('title')[0]
 let applyOptionsButton = document.getElementsByClassName('modal-task-accept')[0];
 
+// Изменения названия раздела при клике в навигации
 inputBlock.addEventListener('keypress', AddTaskToScreen);
 myDay.addEventListener('click', () =>  {
   title.innerHTML = 'Мой день';
@@ -28,44 +28,42 @@ allTask.addEventListener('click', () =>  {
   title.innerHTML = 'Контроль исполнения'
 })
 
-
+//Добавление задачи на экран при нажатии "enter"
 function AddTaskToScreen(e){
   if (e.key === 'Enter'){
     if (inputBlock.value!=''){
-      let inputValue = inputBlock.value;
-      /*Думать дальше как решить ;(*/
-      /*let div = document.createElement('div');
+      let inputValue = inputBlock.value;      
+      let div = document.createElement('div');
       div.className = "task";      
       div.innerHTML = `<img src="icon/circle.svg" alt="выполнено" onclick="completeTask(this)"><p class='task-text'>${inputValue}</p>`;
       blockTask.append(div);
-      div.childNodes[1].addEventListener('click', toggleTaskOptions)*/ 
+      div.childNodes[1].addEventListener('click', toggleTaskOptions)
       document.activeElement.blur();
       inputBlock.value = '';    
-      add_to_database(inputValue);
-     /* window.location.reload(); Хрень получается!*/
-      
+      add_to_database(inputValue);    
     }
     else {
       alert('Что все-таки ввести придется ;)')
     }    
-  }  
-  
+  }   
 }
 
+// Функции-события описанные в html
+// фокус при добавлении задачи
 function inputFocus(self) {
   self.style.backgroundImage = 'url(icon/circle.svg)';
   self.placeholder = ''
   self.style.width = '800px';
   self.style.transition = '1s';
 }
-
+//снятие фокуса после добавления задачи
 function inputBlur(self)  {
   self.style.backgroundImage = 'url(icon/plus.svg)';
   self.placeholder = 'Новая задача'
   self.style.width = '400px';
   self.style.transition = '.5s';
 }
-
+//Завершение задачи после выполнения (нажатие на круг слева)
 function completeTask(self) {
   comp_div = document.getElementsByClassName('completed-task')[0]
   comp_elem = document.getElementsByClassName('completed-task-inner')[0];
@@ -85,14 +83,43 @@ function completeTask(self) {
   } 
 }
 
+//Функции для связи с backend
+// Запуск приложения (поиск пользователя в БД, заполнение профиля (имя, почта), заполнение задач из БД)
 async function start_app(){
     value = await eel.start_app()();      
     log_up(value[0][0])
     email_up(value[0][1])
     add_task_db(value[1])  
-    
 }
-
+//Заполнение профиля. Имя
+function log_up(user_name) {
+  let name = document.getElementsByClassName('name')[0];
+  name.innerHTML = user_name
+}
+//Заполнение профиля. Почта
+function email_up(email) {
+  let name = document.getElementsByClassName('email')[0];
+  name.innerHTML = email
+}
+// Добавление задачи в БД при создании новой
+async function add_to_database(text){  
+  value = await eel.add_to_db(text)();
+  if (value ===  true) {    
+    console.log('Добавление прошло успешно')
+  } else {
+    console.log('Что-то пошло не так')
+  }
+}
+// Получение групп задач для заполнения select в блоке опции
+async function get_data_by_groups(){  
+  groups = await eel.get_groups()();  
+  return groups
+}
+//Отправка данных в базу данных
+async function send_new_data(ID, creation_date, completion_date, text_task, who_appointed, whom_is_assigned, task_group){
+  await eel.update_all_data(ID, creation_date, completion_date, text_task, who_appointed, whom_is_assigned, task_group)();
+}
+// Заполнение задач из БД
 function add_task_db(value) {
   for (let i = 0; i < value.length; i++) {    
     let text_element = value[i][9];
@@ -109,34 +136,11 @@ function add_task_db(value) {
     div.setAttribute('data-whom-is-assigned', (value[i][13] != 'None') ? value[i][13] : " ");
     div.setAttribute('data-task-group', (value[i][14] != 'None') ? value[i][14] : " ");    
     blockTask.append(div);
-    div.childNodes[1].addEventListener('click', toggleTaskOptions)            
-  }  
-  
-}
+    div.childNodes[1].addEventListener('click', toggleTaskOptions);            
+  };
+};
 
-async function add_to_database(text){  
-  value = await eel.add_to_db(text)();
-  if (value ===  true) {    
-    console.log('Добавление прошло успешно')
-  } else {
-    console.log('Что-то пошло не так')
-  }
-}
-
-async function get_data_by_groups(){  
-  groups = await eel.get_groups()();  
-  return groups
-}
-
-function log_up(user_name) {
-  let name = document.getElementsByClassName('name')[0];
-  name.innerHTML = user_name
-}
-
-function email_up(email) {
-  let name = document.getElementsByClassName('email')[0];
-  name.innerHTML = email
-}
+// Функция показать/скрыть опции задачи, формирование данных для блока настроек
 
 function toggleTaskOptions(self, event) {  
   modal = document.querySelector('.modal-block');
@@ -144,10 +148,11 @@ function toggleTaskOptions(self, event) {
   modal.classList.toggle('modal-active');
   btn_close.addEventListener('click', ()=> {
     modal.classList.remove('modal-active');
-  })
+  });
   /*формируем данные для блока опции*/  
   let text = document.querySelector('textarea.modal-text');
-  text.value = self.path[0].parentElement.dataset.taskText; 
+  text.value = self.path[0].parentElement.dataset.taskText;
+  text.setAttribute('data-task-id', self.path[0].parentElement.dataset.taskId); 
   let dateStart = document.querySelector('input.modal-date-start');
   dateStart.value = new Date(self.path[0].parentElement.dataset.creationDate).toISOString().split('T')[0];
   let dateEnd = document.querySelector('input.modal-date-end');
@@ -158,11 +163,11 @@ function toggleTaskOptions(self, event) {
   whomIsAssigned.value = (self.path[0].parentElement.dataset.whomIsAssigned != ' ') ? self.path[0].parentElement.dataset.whomIsAssigned: 'Нет';
   get_data_by_groups().then(function(result) {  
     let taskGroup = document.querySelector('select.modal-option-select');
-    taskGroup.innerHTML = ''
+    taskGroup.innerHTML = '';
     for (let i = 0; i < result.length; i++) {
       const element = result[i];
-      let option = document.createElement('option');
-      if (element == self.path[0].parentElement.dataset.taskGroup){
+      let option = document.createElement('option');           
+      if (element == self.path[0].parentElement.dataset.taskGroup){        
         option.setAttribute('selected', 'selected');
       } else {
         option.setAttribute('disabled', 'disabled');
@@ -173,12 +178,78 @@ function toggleTaskOptions(self, event) {
   });
 }
 
+//Функционал блока "Дополнительные опции" в настройке задач
+function fieldset_change(self){
+  let dateEnd = document.querySelector('input.modal-date-end');
+  let taskGroup = document.querySelectorAll('select.modal-option-select > option');
+  let whomIsAssigned = document.querySelector('input.option-to-assign');
+  if (self.checked == true){
+    switch (self.name) {
+      case 'date':
+        dateEnd.removeAttribute('readonly'); 
+        break;
+      case 'type':       
+        for (let i = 0; i < taskGroup.length; i++) {
+          const element = taskGroup[i];
+          element.removeAttribute('disabled');          
+        }
+        break;
+      case 'horn':
+        console.log('Установить напоминание');
+        break;
+      case 'repeat':
+        console.log('Установить цикличность');
+        break;
+      case 'assign':
+        whomIsAssigned.removeAttribute('readonly');
+        break;
+      default:
+        break;
+    }
+  } else {
+      switch (self.name) {
+        case 'date':
+          dateEnd.setAttribute('readonly', 'readonly'); 
+          break;
+        case 'type':        
+          for (let i = 0; i < taskGroup.length; i++) {
+            const element = taskGroup[i];
+            element.setAttribute('disabled', 'disabled');          
+          }
+          break;
+        case 'horn':
+          console.log('Убрать напоминание');
+          break;
+        case 'repeat':
+          console.log('Убарть цикличность');
+          break;
+        case 'assign':
+          whomIsAssigned.setAttribute('readonly', 'readonly');
+          break;
+        default:
+          break;
+      };  
+  };
+};
+
+// Функционал кнопки "Применить" в блоке "Настройка задачи"
 applyOptionsButton.addEventListener('click', (e) => {
   modal = document.querySelector('.modal-block');
   e.preventDefault();
-  console.log('изменения приняты')
-  modal.classList.remove('modal-active');
-})
+  
+  //Сбор данных из окна настроек задачи
+ let ID = document.querySelector('textarea.modal-text').dataset.taskId;
+ let creation_date = document.querySelector('input.modal-date-start').value;
+ let completion_date = document.querySelector('input.modal-date-end').value;
+ let text = document.querySelector('textarea.modal-text').value;
+ let who_appointed = document.querySelector('input.option-assign').value;
+ let whom_is_assigned = document.querySelector('input.option-to-assign').value;
+ let task_group = document.querySelector("select.modal-option-select").value; 
+ //Отправка данных в базу данных
+ send_new_data(ID, creation_date, completion_date, text, who_appointed, whom_is_assigned, task_group);
+ console.log('изменения приняты');
+ modal.classList.remove('modal-active');
+});
 
-
-start_app()
+//Запуск приложения
+start_app();
