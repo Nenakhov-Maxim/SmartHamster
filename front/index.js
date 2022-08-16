@@ -2,45 +2,51 @@
 //Определение базовых переменных
 let blockTask = document.getElementsByClassName('tasks-container')[0];
 let inputBlock = document.getElementsByClassName('add-task')[0];
-let myDay = document.getElementsByClassName('group-task-myday')[0];
-let important = document.getElementsByClassName('group-task-important')[0];
-let planning = document.getElementsByClassName('group-task-planning')[0];
-let assignedToMe = document.getElementsByClassName('group-task-assigned-to-me')[0];
-let allTask = document.getElementsByClassName('group-task-all-task')[0];
 let title = document.getElementsByClassName('title')[0]
 let applyOptionsButton = document.getElementsByClassName('modal-task-accept')[0];
 
-// Изменения названия раздела при клике в навигации
-inputBlock.addEventListener('keypress', AddTaskToScreen);
-myDay.addEventListener('click', () =>  {
-  title.innerHTML = 'Мой день';
-})
-important.addEventListener('click', () =>  {
-  title.innerHTML = 'Важно'
-})
-planning.addEventListener('click', () =>  {
-  title.innerHTML = 'Запланировано'
-})
-assignedToMe.addEventListener('click', () =>  {
-  title.innerHTML = 'Назначено мне'
-})
-allTask.addEventListener('click', () =>  {
-  title.innerHTML = 'Контроль исполнения'
-})
+// Открытие/закрытие модального окна
+modal = document.querySelector('.modal-block');
+btn_close = document.querySelector('.close-block');
+document.addEventListener('click', (e)=>{
+  modal_active = document.querySelector('.modal-active');  
+  if (modal_active && !e.target.classList.contains('task-text') && !e.path.includes(modal_active)) {    
+    modal.classList.remove('modal-active');
+  }
+});
+
+btn_close.addEventListener('click', ()=> {
+  modal.classList.remove('modal-active');
+});
+
+// Работа меню навигации
+for (let i = 0; i < document.querySelector('.group-task').childNodes.length; i++) {
+  const element = document.querySelector('.group-task').childNodes[i];
+  if (element.nodeType == 1) {
+    element.addEventListener('click', (e)=> {
+      title.innerHTML = element.innerHTML;           
+      document.querySelector('.active-nav').classList.remove('active-nav');
+      element.classList.add('active-nav');      
+    })      
+  } 
+}
 
 //Добавление задачи на экран при нажатии "enter"
+inputBlock.addEventListener('keypress', AddTaskToScreen);
 function AddTaskToScreen(e){
   if (e.key === 'Enter'){
     if (inputBlock.value!=''){
       let inputValue = inputBlock.value;      
-      let div = document.createElement('div');
+      /*let div = document.createElement('div');      
       div.className = "task";      
       div.innerHTML = `<img src="icon/circle.svg" alt="выполнено" onclick="completeTask(this)"><p class='task-text'>${inputValue}</p>`;
       blockTask.append(div);
       div.childNodes[1].addEventListener('click', toggleTaskOptions)
+       */
       document.activeElement.blur();
-      inputBlock.value = '';    
-      add_to_database(inputValue);    
+      inputBlock.value = '';   
+      add_to_database(inputValue);      
+      start_app();    
     }
     else {
       alert('Что все-таки ввести придется ;)')
@@ -121,11 +127,15 @@ async function send_new_data(ID, creation_date, completion_date, text_task, who_
 }
 // Заполнение задач из БД
 function add_task_db(value) {
+  blockTask.innerHTML = '';
   for (let i = 0; i < value.length; i++) {    
     let text_element = value[i][9];
     let div = document.createElement('div');
     div.className = "task";
-    div.innerHTML = `<img src="icon/circle.svg" alt="выполнено" onclick="completeTask(this)"><p class='task-text'>${text_element.slice(0, 20)}...</p>`;
+    if (text_element.length >= 20) {
+      text_element = text_element.slice(0, 20) + '...';
+    };
+    div.innerHTML = `<img src="icon/circle.svg" alt="выполнено" onclick="completeTask(this)"><p class='task-text'>${text_element}</p>`;
     div.setAttribute('data-task-text', (value[i][9] != 'None') ? value[i][9] : " ")
     div.setAttribute('data-task-id', (value[i][0] != 'None') ? value[i][0] : " ");    
     div.setAttribute('data-creation-date', (value[i][7] != 'None') ? value[i][7] : "");
@@ -142,13 +152,11 @@ function add_task_db(value) {
 
 // Функция показать/скрыть опции задачи, формирование данных для блока настроек
 
-function toggleTaskOptions(self, event) {  
-  modal = document.querySelector('.modal-block');
-  btn_close = document.querySelector('.close-block');  
-  modal.classList.toggle('modal-active');
-  btn_close.addEventListener('click', ()=> {
-    modal.classList.remove('modal-active');
-  });
+
+function toggleTaskOptions(self, event) {
+  if (!modal.classList.contains('modal-active')) {
+    modal.classList.add('modal-active');
+  }   
   /*формируем данные для блока опции*/  
   let text = document.querySelector('textarea.modal-text');
   text.value = self.path[0].parentElement.dataset.taskText;

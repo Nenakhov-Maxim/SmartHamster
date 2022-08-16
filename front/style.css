@@ -70,6 +70,7 @@ body {
 .group-task-myday {
   position: relative;
   padding: 10px 5px 10px 30px;
+  transition: All 0.7s;
 }
 
 .group-task-myday::before {
@@ -93,6 +94,7 @@ body {
 .group-task-important  {
   position: relative;
   padding: 10px 5px 10px 30px;
+  transition: All 0.7s;
 }
 
 .group-task-important::before {
@@ -116,6 +118,7 @@ body {
 .group-task-planning {
   position: relative;
   padding: 10px 5px 10px 30px;
+  transition: All 0.7s;
 }
 
 .group-task-planning::before {
@@ -138,6 +141,7 @@ body {
 .group-task-assigned-to-me {
   position: relative;
   padding: 10px 5px 10px 30px;
+  transition: All 0.7s;
 }
 
 .group-task-assigned-to-me::before {
@@ -160,6 +164,7 @@ body {
 .group-task-all-task {
   position: relative;
   padding: 10px 5px 10px 30px;
+  transition: All 0.7s;
 }
 
 .group-task-all-task::before {
@@ -177,6 +182,10 @@ body {
 .group-task-all-task:hover  {
   background-color: rgb(211, 211, 211);
   cursor: pointer;
+}
+
+.active-nav {
+  background-color: rgb(211, 211, 211);  
 }
 
 .list-task-container {
@@ -216,6 +225,7 @@ body {
 
 .task {  
   display: flex;
+  align-items: center;
   background-color: rgb(255, 255, 255, 0.75);
   width: 95%;  
   border-radius: 10px;
@@ -237,13 +247,13 @@ body {
   width: 30px;
   background-size: contain;
   background-position: center;
-  background-repeat: no-repeat;
-  background-position: 4px 15px;  
+  background-repeat: no-repeat;    
 }
 
 .task img:hover {  
   background-image: url(icon/check.svg);  
-  animation: ani .5s forwards;   
+  animation: ani .5s forwards;
+  background-position: 0.1vw -0.2vw;  
 }
 
 .completed  {
