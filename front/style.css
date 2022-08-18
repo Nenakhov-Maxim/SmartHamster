@@ -224,6 +224,7 @@ body {
 }
 
 .task {  
+  position: relative;
   display: flex;
   align-items: center;
   background-color: rgb(255, 255, 255, 0.75);
@@ -256,6 +257,21 @@ body {
   background-position: 0.1vw -0.2vw;  
 }
 
+.important-task {
+  position: absolute;
+  content: '';
+  background-image: url(icon/star.svg);  
+  background-repeat: no-repeat;
+  background-size: cover;
+  width: 30px;
+  height: 30px;
+  right: 2vw;
+  transition: all .4s;
+}
+.star-on {
+  background-image: url(icon/star-on.svg);
+}
+
 .completed  {
   position: relative;    
 }
@@ -264,8 +280,7 @@ body {
   border-bottom: 2px solid rgb(0, 0, 0);
   position: absolute;
   content: "";
-  width: 92%;
-  height: 48%;
+  width: 85%;  
   left: 55px;  
 }
 
@@ -275,6 +290,10 @@ body {
 
 .completed-task h2 {
   color: white;
+}
+
+.delete {
+  background-image: url(icon/del.svg);
 }
 
 @keyframes ani {

@@ -54,6 +54,26 @@ function AddTaskToScreen(e){
   }   
 }
 
+//Добавление в избранное, удаление задачи
+
+function toggleCompleteAction(self){
+  ID = self.parentElement.dataset.taskId;
+  if(self.classList.contains('delete')){
+    deletedTask(ID);
+    self.parentElement.remove();
+  } else {
+    self.classList.toggle('star-on');
+    if (self.classList.contains('star-on')) {      
+      impr = true;
+      updImportantTask(ID, impr);              
+    }else {
+      impr = false;
+      updImportantTask(ID, impr);
+    }  
+  }  
+  
+}
+
 // Функции-события описанные в html
 // фокус при добавлении задачи
 function inputFocus(self) {
@@ -71,23 +91,25 @@ function inputBlur(self)  {
 }
 //Завершение задачи после выполнения (нажатие на круг слева)
 function completeTask(self) {
-  comp_div = document.getElementsByClassName('completed-task')[0]
-  comp_elem = document.getElementsByClassName('completed-task-inner')[0];
-  task_inner = 
+  comp_div = document.getElementsByClassName('completed-task')[0];
+  comp_elem = document.getElementsByClassName('completed-task-inner')[0];  
   self.style.backgroundImage = 'url(icon/check.svg)';
+  self.style.backgroundPosition = '0.1vw -0.2vw';    
   if(self.parentElement.classList.value == 'task'){
     self.parentElement.classList.toggle('completed');
-    comp_elem.append(self.parentElement)
-    comp_div.style.display = 'block'
+    comp_elem.append(self.parentElement);
+    comp_div.style.display = 'block';    
+    self.parentElement.querySelector('.important-task').classList.add('delete');
   } else {
     self.parentElement.classList.toggle('completed');
+    self.parentElement.querySelector('.important-task').classList.remove('delete');
     blockTask.append(self.parentElement);
     self.style.backgroundImage = '';
     if (document.querySelector('.completed') == null) {
-      comp_div.style.display = 'None'
-    }
-  } 
-}
+      comp_div.style.display = 'None';
+    };
+  }; 
+};
 
 //Функции для связи с backend
 // Запуск приложения (поиск пользователя в БД, заполнение профиля (имя, почта), заполнение задач из БД)
@@ -129,26 +151,40 @@ async function send_new_data(ID, creation_date, completion_date, text_task, who_
 function add_task_db(value) {
   blockTask.innerHTML = '';
   for (let i = 0; i < value.length; i++) {    
-    let text_element = value[i][9];
-    let div = document.createElement('div');
-    div.className = "task";
-    if (text_element.length >= 20) {
-      text_element = text_element.slice(0, 20) + '...';
-    };
-    div.innerHTML = `<img src="icon/circle.svg" alt="выполнено" onclick="completeTask(this)"><p class='task-text'>${text_element}</p>`;
-    div.setAttribute('data-task-text', (value[i][9] != 'None') ? value[i][9] : " ")
-    div.setAttribute('data-task-id', (value[i][0] != 'None') ? value[i][0] : " ");    
-    div.setAttribute('data-creation-date', (value[i][7] != 'None') ? value[i][7] : "");
-    div.setAttribute('data-completion-date', (value[i][8] != 'None') ? value[i][8] : ""); 
-    div.setAttribute('data-status', (value[i][10] != 'None') ? value[i][10] : " ");
-    div.setAttribute('data-visibillity', (value[i][11] != 'None') ? value[i][11] : " ");
-    div.setAttribute('data-who-appointed', (value[i][12] != 'None') ? value[i][12] : " ");
-    div.setAttribute('data-whom-is-assigned', (value[i][13] != 'None') ? value[i][13] : " ");
-    div.setAttribute('data-task-group', (value[i][14] != 'None') ? value[i][14] : " ");    
-    blockTask.append(div);
-    div.childNodes[1].addEventListener('click', toggleTaskOptions);            
+    if (value[i][11] == "True") {
+      let text_element = value[i][9];
+      let div = document.createElement('div');
+      div.className = "task";
+      if (text_element.length >= 20) {
+        text_element = text_element.slice(0, 20) + '...';
+      };
+      div.innerHTML = `<img src="icon/circle.svg" alt="выполнено" onclick="completeTask(this)"><p class='task-text'>${text_element}</p><div class="important-task"></div>`;
+      div.setAttribute('data-task-text', (value[i][9] != 'None') ? value[i][9] : " ")
+      div.setAttribute('data-task-id', (value[i][0] != 'None') ? value[i][0] : " ");    
+      div.setAttribute('data-creation-date', (value[i][7] != 'None') ? value[i][7] : "");
+      div.setAttribute('data-completion-date', (value[i][8] != 'None') ? value[i][8] : ""); 
+      div.setAttribute('data-status', (value[i][10] != 'None') ? value[i][10] : " ");
+      //div.setAttribute('data-visibillity', (value[i][11] != 'None') ? value[i][11] : " ");
+      div.setAttribute('data-who-appointed', (value[i][12] != 'None') ? value[i][12] : " ");
+      div.setAttribute('data-whom-is-assigned', (value[i][13] != 'None') ? value[i][13] : " ");
+      div.setAttribute('data-task-group', (value[i][14] != 'None') ? value[i][14] : " ");    
+      blockTask.append(div);
+      div.childNodes[1].addEventListener('click', toggleTaskOptions);
+      div.querySelector('.important-task').setAttribute('onclick', 'toggleCompleteAction(this)');
+      if (value[i][15] == "True") {
+        div.querySelector('.important-task').classList.add('star-on');
+      };
+    };               
   };
 };
+// Изменить важность задачи в бд
+async function updImportantTask(ID, impr){
+  await eel.update_important(ID, impr)();
+}
+//Удалить задачу из БД (скрыть ее во фронде! фактически не удаляется(для статистики))
+async function deletedTask(ID){
+  await eel.del_task(ID)();
+}
 
 // Функция показать/скрыть опции задачи, формирование данных для блока настроек
 

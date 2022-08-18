@@ -5,10 +5,10 @@ from back.data.database import Base
 class Status(Base):
     __tablename__ = 'statusgroup'
     id = Column(Integer, primary_key=True)
-    group_name = Column(String)
+    status_name = Column(String)
     status = relationship('Task')
 
 
 
     def __repr__(self):
-        return f'Группа: {self.group_name}, id: {self.id}'
+        return f'{self.group_name}/{self.id}'

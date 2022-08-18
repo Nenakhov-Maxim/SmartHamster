@@ -25,3 +25,11 @@ def get_groups():
 @eel.expose
 def update_all_data(ID, creation_date, completion_date, text_task, who_appointed, whom_is_assigned, task_group):
     app.updating_task_data(ID, creation_date, completion_date, text_task, who_appointed, whom_is_assigned, task_group)
+
+@eel.expose
+def update_important(ID, impr):
+    app.update_important_task(ID, impr)
+
+@eel.expose
+def del_task(ID):
+    app.delete_task(ID)

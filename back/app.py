@@ -30,13 +30,25 @@ class StartApp:
         for it in self.session.query(Worker):
             return str(it).split('/')
 
-    def add_task(self, worker_id: int, text_task: str, status: int = 2, visibility: bool = True, completion_date=None,
+    def add_task(self, worker_id: int,
+                 text_task: str,
+                 status: int = 2,
+                 visibility: bool = True,
+                 completion_date=None,
                  who_appointed: int = None,
-                 whom_is_assigned: int = None, task_group: int = 10):
-        new_task = Task(worker_id=worker_id, text_task=text_task, creation_date=datetime.datetime.now(), status=status,
-                        visibility=visibility, completion_date=completion_date, who_appointed_id=who_appointed,
+                 whom_is_assigned: int = None,
+                 task_group: int = 10,
+                 important: bool = False):
+        new_task = Task(worker_id=worker_id,
+                        text_task=text_task,
+                        creation_date=datetime.datetime.now(),
+                        status=status,
+                        visibility=visibility,
+                        completion_date=completion_date,
+                        who_appointed_id=who_appointed,
                         whom_is_assigned_id=whom_is_assigned,
-                        task_group_id=task_group)
+                        task_group_id=task_group,
+                        important=important)
         self.session.add(new_task)
         self.session.commit()
         return True
@@ -86,6 +98,13 @@ class StartApp:
                                                                'who_appointed_id': who_appointed,
                                                                'whom_is_assigned_id': whom_is_assigned,
                                                                'task_group_id': task_group})
+        self.session.commit()
+
+    def update_important_task(self, ID, value:bool):
+        self.session.query(Task).filter(Task.id == ID).update({'important': value})
+        self.session.commit()
+    def delete_task(self, ID):
+        self.session.query(Task).filter(Task.id == ID).update({'visibility': False})
         self.session.commit()
 
 

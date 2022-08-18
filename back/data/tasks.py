@@ -9,6 +9,7 @@ class Task(Base):
     worker_id = Column(Integer, ForeignKey('workers.id'))
     text_task = Column(String)
     status = Column(String, ForeignKey('statusgroup.id'))
+    important = Column(Boolean)
     visibility = Column(Boolean)
     creation_date = Column(TIMESTAMP)
     completion_date = Column(TIMESTAMP)
@@ -23,6 +24,6 @@ class Task(Base):
     def __repr__(self):
         return f'{self.id}/{self.worker}/{self.creation_date}/{self.completion_date}/' \
                f'{self.text_task}/{self.status}/{self.visibility}/{self.who_appointed_id}/' \
-               f'{self.whom_is_assigned_id}/{self.task_group}'
+               f'{self.whom_is_assigned_id}/{self.task_group}/{self.important}'
 
 
