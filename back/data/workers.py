@@ -28,7 +28,6 @@ class Worker(Base):
 
     def __repr__(self):
         info: str = f'{self.surname} {self.name} {self.patronymic}/{self.email}/{self.employee_number}/{self.group}/{self.id}'
-
         return info
 
     # def return_data(self):

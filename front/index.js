@@ -26,8 +26,10 @@ for (let i = 0; i < document.querySelector('.group-task').childNodes.length; i++
     element.addEventListener('click', (e)=> {
       title.innerHTML = element.innerHTML;           
       document.querySelector('.active-nav').classList.remove('active-nav');
-      element.classList.add('active-nav');      
-    })      
+      element.classList.add('active-nav');  
+      key = element.dataset.key;
+      start_app(key);      
+    })     
   } 
 }
 
@@ -113,8 +115,8 @@ function completeTask(self) {
 
 //Функции для связи с backend
 // Запуск приложения (поиск пользователя в БД, заполнение профиля (имя, почта), заполнение задач из БД)
-async function start_app(){
-    value = await eel.start_app()();      
+async function start_app(key='P'){  
+    value = await eel.start_app(key)();      
     log_up(value[0][0])
     email_up(value[0][1])
     add_task_db(value[1])  
@@ -149,33 +151,42 @@ async function send_new_data(ID, creation_date, completion_date, text_task, who_
 }
 // Заполнение задач из БД
 function add_task_db(value) {
-  blockTask.innerHTML = '';
-  for (let i = 0; i < value.length; i++) {    
-    if (value[i][11] == "True") {
-      let text_element = value[i][9];
-      let div = document.createElement('div');
-      div.className = "task";
-      if (text_element.length >= 20) {
-        text_element = text_element.slice(0, 20) + '...';
-      };
-      div.innerHTML = `<img src="icon/circle.svg" alt="выполнено" onclick="completeTask(this)"><p class='task-text'>${text_element}</p><div class="important-task"></div>`;
-      div.setAttribute('data-task-text', (value[i][9] != 'None') ? value[i][9] : " ")
-      div.setAttribute('data-task-id', (value[i][0] != 'None') ? value[i][0] : " ");    
-      div.setAttribute('data-creation-date', (value[i][7] != 'None') ? value[i][7] : "");
-      div.setAttribute('data-completion-date', (value[i][8] != 'None') ? value[i][8] : ""); 
-      div.setAttribute('data-status', (value[i][10] != 'None') ? value[i][10] : " ");
-      //div.setAttribute('data-visibillity', (value[i][11] != 'None') ? value[i][11] : " ");
-      div.setAttribute('data-who-appointed', (value[i][12] != 'None') ? value[i][12] : " ");
-      div.setAttribute('data-whom-is-assigned', (value[i][13] != 'None') ? value[i][13] : " ");
-      div.setAttribute('data-task-group', (value[i][14] != 'None') ? value[i][14] : " ");    
-      blockTask.append(div);
-      div.childNodes[1].addEventListener('click', toggleTaskOptions);
-      div.querySelector('.important-task').setAttribute('onclick', 'toggleCompleteAction(this)');
-      if (value[i][15] == "True") {
-        div.querySelector('.important-task').classList.add('star-on');
-      };
-    };               
-  };
+    blockTask.innerHTML = '';
+    for (let i = 0; i < value.length; i++) {    
+      if (value[i][11] == "True") {
+        let text_element = value[i][9];
+        let div = document.createElement('div');
+        div.className = "task";
+        if (text_element.length >= 20) {
+          text_element = text_element.slice(0, 20) + '...';
+        };
+        div.innerHTML = `<img src="icon/circle.svg" alt="выполнено" onclick="completeTask(this)">
+                        <p class='task-text'>${text_element}</p>
+                        <div class="important-task"></div>
+                        <div class="sub-startdate-task"><p>Создано: ${value[i][7].split(' ')[0]}</p></div>
+                        <div class="sub-enddate-task"><p>Закончить: ${value[i][8].split(' ')[0]}</p></div>`;
+        
+        if (new Date(value[i][8]) < new Date()) {
+          div.querySelector(".sub-enddate-task").style.backgroundColor = 'rgba(143, 34, 14, 0.75)'
+        }                 
+        div.setAttribute('data-task-text', (value[i][9] != 'None') ? value[i][9] : " ")
+        div.setAttribute('data-task-id', (value[i][0] != 'None') ? value[i][0] : " ");    
+        div.setAttribute('data-creation-date', (value[i][7] != 'None') ? value[i][7] : "");
+        div.setAttribute('data-completion-date', (value[i][8] != 'None') ? value[i][8] : ""); 
+        div.setAttribute('data-status', (value[i][10] != 'None') ? value[i][10] : " ");
+        //div.setAttribute('data-visibillity', (value[i][11] != 'None') ? value[i][11] : " ");
+        div.setAttribute('data-who-appointed', (value[i][12] != 'None') ? value[i][12] : " ");
+        div.setAttribute('data-whom-is-assigned', (value[i][13] != 'None') ? value[i][13] : " ");
+        div.setAttribute('data-task-group', (value[i][14] != 'None') ? value[i][14] : " ");    
+        blockTask.append(div);
+        console.log(div.childNodes)
+        div.querySelector('p.task-text').addEventListener('click', toggleTaskOptions);
+        div.querySelector('.important-task').setAttribute('onclick', 'toggleCompleteAction(this)');
+        if (value[i][15] == "True") {
+          div.querySelector('.important-task').classList.add('star-on');
+        };
+      };               
+    };
 };
 // Изменить важность задачи в бд
 async function updImportantTask(ID, impr){
@@ -185,10 +196,13 @@ async function updImportantTask(ID, impr){
 async function deletedTask(ID){
   await eel.del_task(ID)();
 }
+//Получить список зарегистрированных пользователнй
+async function getUsers(){
+  return await eel.get_workers()();
+  
+}
 
 // Функция показать/скрыть опции задачи, формирование данных для блока настроек
-
-
 function toggleTaskOptions(self, event) {
   if (!modal.classList.contains('modal-active')) {
     modal.classList.add('modal-active');
@@ -293,6 +307,20 @@ applyOptionsButton.addEventListener('click', (e) => {
  send_new_data(ID, creation_date, completion_date, text, who_appointed, whom_is_assigned, task_group);
  console.log('изменения приняты');
  modal.classList.remove('modal-active');
+});
+
+//Автокомплит для назначения ответственных (библиотека jquery)
+$( function() {
+  getUsers().then(function(result){
+    var availableTags = [];
+    for (let i = 0; i < result.length; i++) {
+      const element = result[i];
+      availableTags.push(element);
+    }    
+    $( "#tags" ).autocomplete({
+      source: availableTags
+    });
+  })
 });
 
 //Запуск приложения

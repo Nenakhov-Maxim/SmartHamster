@@ -5,12 +5,12 @@ from back.app import StartApp
 app = StartApp()
 
 @eel.expose
-def start_app():
+def start_app(key: str = 'P'):
     user = app.find_user('32428')  #getpass.getuser() - в идеале через эту функцию!
     if user is None:
         return ['Незарегистрированныйй пользователь', 'Неизвестный Email']
     else:
-        tasks = app.get_tasks()
+        tasks = app.get_tasks(key)
         return user, tasks
 
 @eel.expose
@@ -33,3 +33,7 @@ def update_important(ID, impr):
 @eel.expose
 def del_task(ID):
     app.delete_task(ID)
+
+@eel.expose
+def get_workers():
+    return app.info_workers()

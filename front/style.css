@@ -1,5 +1,22 @@
+@font-face {
+	font-family: 'Butler_Regular_Stencil'; 
+	src: local('Butler_Regular_Stencil'),
+		url(/front/fonts/Butler/Butler_Stencil/Butler_Regular_Stencil.otf); 
+}
+@font-face {
+	font-family: 'ButlerStencil-Medium'; 
+	src: local('ButlerStencil-Medium'),
+		url(/front/fonts/Butler/Butler_Stencil/Butler_Medium_Stencil.otf); 
+}
+
+@font-face {
+	font-family: 'Arvo'; 
+	src: local('Arvo'),
+		url(fonts/Arvo/Arvo-Regular.ttf); 
+}
+
 body {
-  font-family: sans-serif;
+  font-family: Arvo;
   font-size: 22px;
   width: 100%;
   min-height: 100vh;
@@ -239,6 +256,10 @@ body {
   cursor: pointer; 
 }
 
+.task:nth-child(n+2) {  
+  margin-top: 100px;
+}
+
 .task p {
   padding-left: 1vw;
   width: 100%;
@@ -268,6 +289,34 @@ body {
   right: 2vw;
   transition: all .4s;
 }
+
+.sub-startdate-task {
+  position: absolute;
+  width: 220px;
+  height: 50px;
+  content: '';
+  background-color: rgba(137, 123, 170, 0.75);
+  right: 1vw;
+  top: -52px;
+  font-size: 18px;
+  border-radius: 10px 10px 0 0;
+  border-bottom: 2px solid black;
+}
+
+.sub-enddate-task {
+  position: absolute;
+  width: 220px;
+  height: 50px;
+  content: '';
+  background-color: rgba(54, 121, 73, 0.75);
+  right: 16vw;
+  bottom: -52px;
+  font-size: 18px;
+  border-radius: 0px 0px 10px 10px;
+  border-top: 2px solid black;
+  text-align: left;
+}
+
 .star-on {
   background-image: url(icon/star-on.svg);
 }

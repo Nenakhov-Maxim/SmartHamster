@@ -7,7 +7,10 @@
   <title>Alarma ToDo</title>  
   <link rel="stylesheet" href="normalize.css">
   <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="jQ/jquery-ui.css">
   <script type="text/javascript" src="/eel.js"></script>
+  <script src="jQ/jquery-3.6.0.min.js"></script>
+  <script src="jQ/jquery-ui.js"></script>
 </head>
 <body>
   <div class="container">
@@ -27,11 +30,11 @@
         </div>
       </div>
       <div class="group-task">
-        <div class="group-task-myday">Мой день</div>
-        <div class="group-task-important">Важно</div>
-        <div class="group-task-planning active-nav">Запланировано</div>
-        <div class="group-task-assigned-to-me">Назначен мне</div>
-        <div class="group-task-all-task">Контроль исполнения</div>
+        <div class="group-task-myday" data-key="M">Мой день</div>
+        <div class="group-task-important" data-key="I">Важно</div>
+        <div class="group-task-planning active-nav" data-key="P">Запланировано</div>
+        <div class="group-task-assigned-to-me" data-key="As">Назначен мне</div>
+        <div class="group-task-all-task" data-key="At">Контроль исполнения</div>
       </div>
       <div class="list-task-container">
         <div class="list-task">Свой список</div>
@@ -50,8 +53,14 @@
       <div class="tasks-container">
         <div class="task" data-task-text="12312" data-task-id="1" data-creation-date="2022-08-10 00:00:00" data-completion-date="" data-status="1" data-visibillity="True" data-who-appointed=" " data-whom-is-assigned=" " data-task-group="Экология"><img src="icon/circle.svg" alt="выполнено" onclick="completeTask(this)"><p class="task-text">12312</p>
           <div class="important-task" onclick="toggleCompleteAction(this)"></div>
-        </div>                          
-        
+          <div class="sub-startdate-task"><p>Создано: 2022-08-20</p></div>
+          <div class="sub-enddate-task"><p>Закончить: 2022-08-20</p></div>
+        </div>
+        <div class="task" data-task-text="12312" data-task-id="1" data-creation-date="2022-08-10 00:00:00" data-completion-date="" data-status="1" data-visibillity="True" data-who-appointed=" " data-whom-is-assigned=" " data-task-group="Экология"><img src="icon/circle.svg" alt="выполнено" onclick="completeTask(this)"><p class="task-text">12312</p>
+          <div class="important-task" onclick="toggleCompleteAction(this)"></div>
+          <div class="sub-startdate-task"><p>Создано: 2022-08-20</p></div>
+          <div class="sub-enddate-task"><p>Закончить: 2022-08-19</p></div>
+        </div>                                     
       </div>
       <div class="completed-task">
         <h2>Завершенные</h2>
@@ -91,7 +100,7 @@
                 </div>
                 <div class="modal-option">
                   <label for="option-to-assign">Кому назначено:</label>
-                  <input class="option-to-assign" type="text" name="option-to-assign" readonly>
+                  <input class="option-to-assign" id="tags" type="text" name="option-to-assign" readonly>
                 </div>
                 <div class="modal-option">
                   <label for="option-select-type">Тип задачи:</label>

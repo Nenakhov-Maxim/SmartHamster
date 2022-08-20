@@ -24,6 +24,7 @@ class Task(Base):
     def __repr__(self):
         return f'{self.id}/{self.worker}/{self.creation_date}/{self.completion_date}/' \
                f'{self.text_task}/{self.status}/{self.visibility}/{self.who_appointed_id}/' \
-               f'{self.whom_is_assigned_id}/{self.task_group}/{self.important}'
+               f'{self.whom_is_assigned}/' \
+               f'{self.task_group}/{self.important}'
 
 

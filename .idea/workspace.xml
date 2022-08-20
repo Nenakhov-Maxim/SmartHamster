@@ -8,9 +8,8 @@
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/alarma.sqlite" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/back/app.py" beforeDir="false" afterPath="$PROJECT_DIR$/back/app.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/back/create_database.py" beforeDir="false" afterPath="$PROJECT_DIR$/back/create_database.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/back/data/status.py" beforeDir="false" afterPath="$PROJECT_DIR$/back/data/status.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/back/data/tasks.py" beforeDir="false" afterPath="$PROJECT_DIR$/back/data/tasks.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/back/data/workers.py" beforeDir="false" afterPath="$PROJECT_DIR$/back/data/workers.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/front/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/front/index.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/front/index.js" beforeDir="false" afterPath="$PROJECT_DIR$/front/index.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/front/style.css" beforeDir="false" afterPath="$PROJECT_DIR$/front/style.css" afterDir="false" />

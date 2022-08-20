@@ -27,14 +27,16 @@ class StartApp:
             print(it)
 
     def info_workers(self):
+        result = []
         for it in self.session.query(Worker):
-            return str(it).split('/')
+            result.append(it.surname + ' ' + it.name[:1] + '.' + it.patronymic[:1] + '.')
+        return result
 
     def add_task(self, worker_id: int,
                  text_task: str,
                  status: int = 2,
                  visibility: bool = True,
-                 completion_date=None,
+                 completion_date=datetime.datetime.now(),
                  who_appointed: int = None,
                  whom_is_assigned: int = None,
                  task_group: int = 10,
@@ -55,17 +57,57 @@ class StartApp:
 
     def find_user(self, num_card):
         for it in self.session.query(Worker).filter(
-            Worker.employee_number == num_card):
+                Worker.employee_number == num_card):
             self.login_user = str(it).split('/')[5]
             return str(it).split('/')
         else:
             return None
 
-    def get_tasks(self):
+    def get_tasks(self, key: str = 'P'):
         result = []
-        for it in self.session.query(Task).filter(Task.worker_id == self.login_user):
-            result.append(str(it).split('/'))
-        return result
+        print(key)
+        if key == 'P':
+            for it in self.session.query(Task).filter(Task.worker_id == self.login_user):
+                parse_task = self.parseTask(it)
+                result.append(parse_task)
+            return result
+        elif key == 'M':
+            for it in self.session.query(Task).filter(Task.worker_id == self.login_user):
+                if it.completion_date != None and it.completion_date.date() == datetime.datetime.now().date():
+                    parse_task = self.parseTask(it)
+                    result.append(parse_task)
+            return result
+        elif key == 'I':
+            for it in self.session.query(Task).filter(and_(Task.worker_id == self.login_user,
+                                                           Task.important == True)):
+                parse_task = self.parseTask(it)
+                result.append(parse_task)
+            return result
+        elif key == 'As':
+            pass
+        elif key == 'At':
+            pass
+    def parseTask(self, it):
+        who_appointed = ''
+        whom_is_assigned = ''
+        if it.who_appointed == None:
+            who_appointed = 'Нет'
+        else:
+            who_appointed = f"{it.who_appointed.surname} {it.who_appointed.name[:1]}.{it.who_appointed.patronymic[:1]}."
+        if it.whom_is_assigned == None:
+            whom_is_assigned = 'Нет'
+        else:
+            whom_is_assigned = f"{it.whom_is_assigned.surname} {it.whom_is_assigned.name[:1]}.{it.whom_is_assigned.patronymic[:1]}."
+        user_name = f"{it.worker.name} {it.worker.surname} {it.worker.patronymic}"
+        user_email = it.worker.email
+        user_number = it.worker.employee_number
+        user_group = it.worker.group.group_name
+        user_group_id = it.worker.group.id
+        user_id = it.worker.id
+        task = [str(it.id), user_name, user_email, user_number, user_group, str(user_group_id), str(user_id),
+                str(it.creation_date), str(it.completion_date), it.text_task, it.status,
+                str(it.visibility), who_appointed, whom_is_assigned, str(it.task_group), str(it.important)]
+        return task
 
     def get_groups(self):
         result = []
@@ -74,7 +116,8 @@ class StartApp:
         return result
 
     # Обновление данных
-    def updating_task_data(self, ID, creation_date, completion_date, text_task, who_appointed, whom_is_assigned, task_group):
+    def updating_task_data(self, ID, creation_date, completion_date, text_task, who_appointed, whom_is_assigned,
+                           task_group):
         for it in self.session.query(Worker).filter(Worker.surname == who_appointed.split(' ')[0]):
             who_appointed = it.id
             break
@@ -92,69 +135,69 @@ class StartApp:
             completion_date = None
         else:
             completion_date = datetime.datetime.strptime(completion_date, '%Y-%m-%d')
-        self.session.query(Task).filter(Task.id == ID).update({'creation_date': datetime.datetime.strptime(creation_date, '%Y-%m-%d'),
-                                                               'completion_date': completion_date,
-                                                               'text_task': text_task,
-                                                               'who_appointed_id': who_appointed,
-                                                               'whom_is_assigned_id': whom_is_assigned,
-                                                               'task_group_id': task_group})
+        self.session.query(Task).filter(Task.id == ID).update(
+            {'creation_date': datetime.datetime.strptime(creation_date, '%Y-%m-%d'),
+             'completion_date': completion_date,
+             'text_task': text_task,
+             'who_appointed_id': who_appointed,
+             'whom_is_assigned_id': whom_is_assigned,
+             'task_group_id': task_group})
         self.session.commit()
 
-    def update_important_task(self, ID, value:bool):
+    def update_important_task(self, ID, value: bool):
         self.session.query(Task).filter(Task.id == ID).update({'important': value})
         self.session.commit()
+
     def delete_task(self, ID):
         self.session.query(Task).filter(Task.id == ID).update({'visibility': False})
         self.session.commit()
-
-
 
 # if __name__ == '__main__':
 #     app = StartApp()
 #     res = app.find_user('32428')
 #     app.get_tasks()
-    # result = str(app.info_workers()).split(' ')
-    # print(result)
+# result = str(app.info_workers()).split(' ')
+# print(result)
 
-    # app.info_task_group()
-    # print('*' * 30)
-    # app.info_work_group()
-    # print('*' * 30)
-    # app.info_workers()
-    # app.add_task(1, 'Новая задача', 2, task_group=10)
-    # app.add_task(1, 'Новая задача2', 3, task_group=10, who_appointed=1, whom_is_assigned=1)
+# app.info_task_group()
+# print('*' * 30)
+# app.info_work_group()
+# print('*' * 30)
+# app.info_workers()
+# app.add_task(1, 'Новая задача', 2, task_group=10)
+# app.add_task(1, 'Новая задача2', 3, task_group=10, who_appointed=1, whom_is_assigned=1)
 
-    # db_is_created = os.path.exists(DATABASE_NAME)
-    # if not db_is_created:
-    #     db_creater.create_dabase()
+# db_is_created = os.path.exists(DATABASE_NAME)
+# if not db_is_created:
+#     db_creater.create_dabase()
 
-    # session = Session()
-    # for it in session.query(Worker):
-    #     print(it)
-    # print('*' * 30)
-    # for it in session.query(Worker).filter(Worker.id == 1):
-    #     print(it)
-    # print('*' * 30)
-    # for it in session.query(Worker).filter(and_(Worker.id == 1,
-    #                                             Worker.name.like('Максим%'))):
-    #     print(it)
-    # print('*' * 30)
-    # for it in session.query(Worker).join(Workgroup).filter(Workgroup.group_name == 'Инженер по наладке и испытаниям'):
-    #     print(it)
-    # print('*' * 30)
-    # for it, gr in session.query(Worker, Workgroup).join(Workgroup):
-    #     print(it, gr)
-    # print('*' * 30)
-    # for it in session.query(Task):
-    #     print(it)
-    # print('*' * 30)
-    # for persona in session.query(Worker).filter(Worker.surname == 'Иванов'):
-    #     print(f'персона - {persona}')
-    #     break
-    # else:
-    #     print('нет')
-    # print('*' * 30)
-    # # new_task = Task(worker=1, text_task='Добавление из кода', date=datetime.datetime.now())
-    # # session.add(new_task)
-    # # session.commit()
-    # # session.close()
+# session = Session()
+# for it in session.query(Worker):
+#     print(it)
+# print('*' * 30)
+# for it in session.query(Worker).filter(Worker.id == 1):
+#     print(it)
+# print('*' * 30)
+# for it in session.query(Worker).filter(and_(Worker.id == 1,
+#                                             Worker.name.like('Максим%'))):
+#     print(it)
+# print('*' * 30)
+# for it in session.query(Worker).join(Workgroup).filter(Workgroup.group_name == 'Инженер по наладке и испытаниям'):
+#     print(it)
+# print('*' * 30)
+# for it, gr in session.query(Worker, Workgroup).join(Workgroup):
+#     print(it, gr)
+# print('*' * 30)
+# for it in session.query(Task):
+#     print(it)
+# print('*' * 30)
+# for persona in session.query(Worker).filter(Worker.surname == 'Иванов'):
+#     print(f'персона - {persona}')
+#     break
+# else:
+#     print('нет')
+# print('*' * 30)
+# # new_task = Task(worker=1, text_task='Добавление из кода', date=datetime.datetime.now())
+# # session.add(new_task)
+# # session.commit()
+# # session.close()
