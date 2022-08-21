@@ -1,10 +1,11 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
+  <link rel="icon" href="Smart Hamster.jpg">
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Alarma ToDo</title>  
+  <title>SmartHamster</title>  
   <link rel="stylesheet" href="normalize.css">
   <link rel="stylesheet" href="style.css">
   <link rel="stylesheet" href="jQ/jquery-ui.css">
@@ -67,10 +68,7 @@
         <div class="completed-task-inner">         
         </div>        
       </div>
-      <input type="text" class="add-task" id="search" name="search" onfocus="inputFocus(this)" onblur="inputBlur(this)" placeholder="Новая задача" />
-      <!-- Модальное окно 
-      <a class="btn-modal" href="#modal-block">Открыть</a>-->
-      <!-- Содержимое модального окна -->
+      <input type="text" class="add-task" id="search" name="search" onfocus="inputFocus(this)" onblur="inputBlur(this)" placeholder="Новая задача" />      
       <div class="modal-block">        
         <div class="modal-inner">
           <div class="modal-title">
@@ -87,10 +85,12 @@
                 <div class="modal-date">
                   <label for="date-start">Задача создана:</label>
                   <input type="date" class="modal-date-start" name="date-start" readonly/>
+                  <input type="time" class="modal-time-start" name="date-start" readonly/>
                 </div>
                 <div class="modal-date">
                   <label for="date-end">Дата выполнения:</label>
                   <input type="date" class="modal-date-end" name="date-end" readonly/>
+                  <input type="time" class="modal-time-end" name="date-end" readonly/>
                 </div>              
               </div>
               <div class="modal-option-task">

@@ -38,13 +38,7 @@ inputBlock.addEventListener('keypress', AddTaskToScreen);
 function AddTaskToScreen(e){
   if (e.key === 'Enter'){
     if (inputBlock.value!=''){
-      let inputValue = inputBlock.value;      
-      /*let div = document.createElement('div');      
-      div.className = "task";      
-      div.innerHTML = `<img src="icon/circle.svg" alt="выполнено" onclick="completeTask(this)"><p class='task-text'>${inputValue}</p>`;
-      blockTask.append(div);
-      div.childNodes[1].addEventListener('click', toggleTaskOptions)
-       */
+      let inputValue = inputBlock.value;   
       document.activeElement.blur();
       inputBlock.value = '';   
       add_to_database(inputValue);      
@@ -146,8 +140,8 @@ async function get_data_by_groups(){
   return groups
 }
 //Отправка данных в базу данных
-async function send_new_data(ID, creation_date, completion_date, text_task, who_appointed, whom_is_assigned, task_group){
-  await eel.update_all_data(ID, creation_date, completion_date, text_task, who_appointed, whom_is_assigned, task_group)();
+async function send_new_data(ID, completion_date, text_task, who_appointed, whom_is_assigned, task_group){
+  await eel.update_all_data(ID, completion_date, text_task, who_appointed, whom_is_assigned, task_group)();
 }
 // Заполнение задач из БД
 function add_task_db(value) {
@@ -164,7 +158,10 @@ function add_task_db(value) {
                         <p class='task-text'>${text_element}</p>
                         <div class="important-task"></div>
                         <div class="sub-startdate-task"><p>Создано: ${value[i][7].split(' ')[0]}</p></div>
-                        <div class="sub-enddate-task"><p>Закончить: ${value[i][8].split(' ')[0]}</p></div>`;
+                        <div class="sub-enddate-task">
+                        <p>Закончить: ${value[i][8].split(' ')[0]}</p>
+                        <p>До: ${value[i][8].split(' ')[1].split('.')[0]}</p>
+                        </div>`;
         
         if (new Date(value[i][8]) < new Date()) {
           div.querySelector(".sub-enddate-task").style.backgroundColor = 'rgba(143, 34, 14, 0.75)'
@@ -173,13 +170,11 @@ function add_task_db(value) {
         div.setAttribute('data-task-id', (value[i][0] != 'None') ? value[i][0] : " ");    
         div.setAttribute('data-creation-date', (value[i][7] != 'None') ? value[i][7] : "");
         div.setAttribute('data-completion-date', (value[i][8] != 'None') ? value[i][8] : ""); 
-        div.setAttribute('data-status', (value[i][10] != 'None') ? value[i][10] : " ");
-        //div.setAttribute('data-visibillity', (value[i][11] != 'None') ? value[i][11] : " ");
+        div.setAttribute('data-status', (value[i][10] != 'None') ? value[i][10] : " ");        
         div.setAttribute('data-who-appointed', (value[i][12] != 'None') ? value[i][12] : " ");
         div.setAttribute('data-whom-is-assigned', (value[i][13] != 'None') ? value[i][13] : " ");
         div.setAttribute('data-task-group', (value[i][14] != 'None') ? value[i][14] : " ");    
-        blockTask.append(div);
-        console.log(div.childNodes)
+        blockTask.append(div);        
         div.querySelector('p.task-text').addEventListener('click', toggleTaskOptions);
         div.querySelector('.important-task').setAttribute('onclick', 'toggleCompleteAction(this)');
         if (value[i][15] == "True") {
@@ -212,9 +207,13 @@ function toggleTaskOptions(self, event) {
   text.value = self.path[0].parentElement.dataset.taskText;
   text.setAttribute('data-task-id', self.path[0].parentElement.dataset.taskId); 
   let dateStart = document.querySelector('input.modal-date-start');
-  dateStart.value = new Date(self.path[0].parentElement.dataset.creationDate).toISOString().split('T')[0];
+  let timeStart = document.querySelector('input.modal-time-start');
+  dateStart.value = formatDate(self.path[0].parentElement.dataset.creationDate)[0];
+  timeStart.value = formatDate(self.path[0].parentElement.dataset.creationDate)[1];
   let dateEnd = document.querySelector('input.modal-date-end');
-  dateEnd.value = (self.path[0].parentElement.dataset.completionDate != '') ? new Date(self.path[0].parentElement.dataset.completionDate).toISOString().split('T')[0]: '';
+  let timeEnd = document.querySelector('input.modal-time-end');
+  dateEnd.value = (self.path[0].parentElement.dataset.completionDate != '') ? formatDate(self.path[0].parentElement.dataset.completionDate)[0]: '';
+  timeEnd.value = (self.path[0].parentElement.dataset.completionDate != '') ? formatDate(self.path[0].parentElement.dataset.completionDate)[1]: '';
   let whoAppointed = document.querySelector('input.option-assign');  
   whoAppointed.value = (self.path[0].parentElement.dataset.whoAppointed != ' ')? self.path[0].parentElement.dataset.whoAppointed: 'Нет';
   let whomIsAssigned = document.querySelector('input.option-to-assign');  
@@ -239,12 +238,14 @@ function toggleTaskOptions(self, event) {
 //Функционал блока "Дополнительные опции" в настройке задач
 function fieldset_change(self){
   let dateEnd = document.querySelector('input.modal-date-end');
+  let timeEnd = document.querySelector('input.modal-time-end');
   let taskGroup = document.querySelectorAll('select.modal-option-select > option');
   let whomIsAssigned = document.querySelector('input.option-to-assign');
   if (self.checked == true){
     switch (self.name) {
       case 'date':
         dateEnd.removeAttribute('readonly'); 
+        timeEnd.removeAttribute('readonly');
         break;
       case 'type':       
         for (let i = 0; i < taskGroup.length; i++) {
@@ -297,14 +298,14 @@ applyOptionsButton.addEventListener('click', (e) => {
   
   //Сбор данных из окна настроек задачи
  let ID = document.querySelector('textarea.modal-text').dataset.taskId;
- let creation_date = document.querySelector('input.modal-date-start').value;
  let completion_date = document.querySelector('input.modal-date-end').value;
- let text = document.querySelector('textarea.modal-text').value;
+ let completion_time = document.querySelector('input.modal-time-end').value;
+ let text =  document.querySelector('.modal-text').value
  let who_appointed = document.querySelector('input.option-assign').value;
  let whom_is_assigned = document.querySelector('input.option-to-assign').value;
- let task_group = document.querySelector("select.modal-option-select").value; 
+ let task_group = document.querySelector("select.modal-option-select").value;  
  //Отправка данных в базу данных
- send_new_data(ID, creation_date, completion_date, text, who_appointed, whom_is_assigned, task_group);
+ send_new_data(ID, completion_date + ' ' + completion_time, text, who_appointed, whom_is_assigned, task_group); //creation_date
  console.log('изменения приняты');
  modal.classList.remove('modal-active');
 });
@@ -322,6 +323,30 @@ $( function() {
     });
   })
 });
+
+function formatDate(val){
+  date = new Date(val);
+  year = date.getFullYear();
+  day = date.getDate();
+  if(day < 10){
+    day = `0${day}`;
+  };
+  month = date.getMonth() + 1;
+  if(month < 10){
+    month = `0${month}`;
+  };
+  hour = date.getHours();
+  if(hour < 10){
+    hour = `0${hour}`;
+  };
+  minute = date.getMinutes();
+  if(minute < 10){
+    minute = `0${minute}`;
+  };
+  refDate = `${year}-${month}-${day}`;
+  refTime = `${hour}:${minute}`;
+  return [refDate, refTime];
+}
 
 //Запуск приложения
 start_app();
