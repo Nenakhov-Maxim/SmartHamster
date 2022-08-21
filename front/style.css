@@ -223,7 +223,7 @@ body {
   background: rgb(0,50,116); 
   display: grid;
   grid-template-rows: 100px auto;
-  border-radius: 40px 0 0 0;
+  border-radius: 0 0 0 0;
   padding-left: 2vw;
 }
 
@@ -557,7 +557,7 @@ input#search {
   display:block;
   width:100px;
   text-align: center;
-  font-family: Arial, Helvetica, sans-serif;
+  /* font-family: Arial, Helvetica, sans-serif; */
   font-size: 14px;
   padding: 8px 16px;
   margin: 20px auto;

@@ -34,7 +34,7 @@ class StartApp:
 
     def add_task(self, worker_id: int,
                  text_task: str,
-                 status: int = 2,
+                 status: int = 3,
                  visibility: bool = True,
                  completion_date=datetime.datetime.now(),
                  who_appointed: int = None,
@@ -86,7 +86,12 @@ class StartApp:
         elif key == 'As':
             pass
         elif key == 'At':
-            pass
+            for it in self.session.query(Task).filter(and_(Task.worker_id == self.login_user,
+                                                           Task.status == 2)):
+                print(it)
+                parse_task = self.parseTask(it)
+                result.append(parse_task)
+            return result
     def parseTask(self, it):
         who_appointed = ''
         whom_is_assigned = ''
@@ -118,6 +123,7 @@ class StartApp:
     # Обновление данных
     def updating_task_data(self, ID, completion_date, text_task, who_appointed, whom_is_assigned,
                            task_group):
+        status = 3
         for it in self.session.query(Worker).filter(Worker.surname == who_appointed.split(' ')[0]):
             who_appointed = it.id
             break
@@ -125,6 +131,11 @@ class StartApp:
             who_appointed = None
         for it in self.session.query(Worker).filter(Worker.surname == whom_is_assigned.split(' ')[0]):
             whom_is_assigned = it.id
+            print(it.id)
+            for it in self.session.query(Task).filter(Task.id == ID):
+                print(it.worker_id)
+                who_appointed = it.worker_id
+                status = 2
             break
         else:
             whom_is_assigned = None
@@ -140,7 +151,8 @@ class StartApp:
              'text_task': text_task,
              'who_appointed_id': who_appointed,
              'whom_is_assigned_id': whom_is_assigned,
-             'task_group_id': task_group})
+             'task_group_id': task_group,
+             'status': status})
         self.session.commit()
 
     def update_important_task(self, ID, value: bool):

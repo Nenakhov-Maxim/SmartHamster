@@ -15,7 +15,7 @@ def start_app(key: str = 'P'):
 
 @eel.expose
 def add_to_db(text):
-    result = app.add_task(1, text, 1)
+    result = app.add_task(1, text)
     return result
 
 @eel.expose

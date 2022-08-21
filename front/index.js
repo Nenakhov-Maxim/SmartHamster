@@ -5,6 +5,14 @@ let inputBlock = document.getElementsByClassName('add-task')[0];
 let title = document.getElementsByClassName('title')[0]
 let applyOptionsButton = document.getElementsByClassName('modal-task-accept')[0];
 
+//Обновление по нажатию кнопки f5
+document.addEventListener('keydown', (e)=> {
+  if (e.keyCode == 116) {
+    e.preventDefault();
+    console.log('F5 pressed')  
+  }
+})
+
 // Открытие/закрытие модального окна
 modal = document.querySelector('.modal-block');
 btn_close = document.querySelector('.close-block');
@@ -27,8 +35,8 @@ for (let i = 0; i < document.querySelector('.group-task').childNodes.length; i++
       title.innerHTML = element.innerHTML;           
       document.querySelector('.active-nav').classList.remove('active-nav');
       element.classList.add('active-nav');  
-      key = element.dataset.key;
-      start_app(key);      
+      k = element.dataset.key;
+      reloadTask(k);      
     })     
   } 
 }
@@ -41,8 +49,9 @@ function AddTaskToScreen(e){
       let inputValue = inputBlock.value;   
       document.activeElement.blur();
       inputBlock.value = '';   
-      add_to_database(inputValue);      
-      start_app();    
+      add_to_database(inputValue);
+      k = document.querySelector('.active-nav').dataset.key             
+      reloadTask(k);    
     }
     else {
       alert('Что все-таки ввести придется ;)')
@@ -51,12 +60,11 @@ function AddTaskToScreen(e){
 }
 
 //Добавление в избранное, удаление задачи
-
 function toggleCompleteAction(self){
   ID = self.parentElement.dataset.taskId;
   if(self.classList.contains('delete')){
     deletedTask(ID);
-    self.parentElement.remove();
+    self.parentElement.remove();    
   } else {
     self.classList.toggle('star-on');
     if (self.classList.contains('star-on')) {      
@@ -66,8 +74,9 @@ function toggleCompleteAction(self){
       impr = false;
       updImportantTask(ID, impr);
     }  
-  }  
-  
+  }
+  k = document.querySelector('.active-nav').dataset.key             
+  reloadTask(k);   
 }
 
 // Функции-события описанные в html
@@ -185,16 +194,25 @@ function add_task_db(value) {
 };
 // Изменить важность задачи в бд
 async function updImportantTask(ID, impr){
-  await eel.update_important(ID, impr)();
+  await eel.update_important(ID, impr)();  
 }
 //Удалить задачу из БД (скрыть ее во фронде! фактически не удаляется(для статистики))
 async function deletedTask(ID){
-  await eel.del_task(ID)();
+  await eel.del_task(ID)(); 
 }
 //Получить список зарегистрированных пользователнй
 async function getUsers(){
   return await eel.get_workers()();
-  
+}
+//Обновление приложения
+async function reloadTask(key){
+  console.log(key)  
+  value = await eel.start_app(key)();
+  add_task_db(value[1]);
+  active_nav = document.querySelector('.active-nav');
+  console.log(active_nav);
+  document.querySelector('.active-nav').classList.remove('active-nav');  
+  active_nav.classList.add('active-nav');
 }
 
 // Функция показать/скрыть опции задачи, формирование данных для блока настроек
@@ -295,19 +313,21 @@ function fieldset_change(self){
 applyOptionsButton.addEventListener('click', (e) => {
   modal = document.querySelector('.modal-block');
   e.preventDefault();
-  
   //Сбор данных из окна настроек задачи
- let ID = document.querySelector('textarea.modal-text').dataset.taskId;
- let completion_date = document.querySelector('input.modal-date-end').value;
- let completion_time = document.querySelector('input.modal-time-end').value;
- let text =  document.querySelector('.modal-text').value
- let who_appointed = document.querySelector('input.option-assign').value;
- let whom_is_assigned = document.querySelector('input.option-to-assign').value;
- let task_group = document.querySelector("select.modal-option-select").value;  
- //Отправка данных в базу данных
- send_new_data(ID, completion_date + ' ' + completion_time, text, who_appointed, whom_is_assigned, task_group); //creation_date
- console.log('изменения приняты');
- modal.classList.remove('modal-active');
+  let ID = document.querySelector('textarea.modal-text').dataset.taskId;
+  let completion_date = document.querySelector('input.modal-date-end').value;
+  let completion_time = document.querySelector('input.modal-time-end').value;
+  let text =  document.querySelector('.modal-text').value
+  let who_appointed = document.querySelector('input.option-assign').value;
+  let whom_is_assigned = document.querySelector('input.option-to-assign').value;
+  let task_group = document.querySelector("select.modal-option-select").value;  
+  //Отправка данных в базу данных
+  send_new_data(ID, completion_date + ' ' + completion_time, text, who_appointed, whom_is_assigned, task_group); //creation_date
+  console.log('изменения приняты');
+  modal.classList.remove('modal-active');
+  k = document.querySelector('.active-nav').dataset.key;
+  console.log(k) 
+  reloadTask(k);
 });
 
 //Автокомплит для назначения ответственных (библиотека jquery)
@@ -324,6 +344,7 @@ $( function() {
   })
 });
 
+// Форматирование даты
 function formatDate(val){
   date = new Date(val);
   year = date.getFullYear();
