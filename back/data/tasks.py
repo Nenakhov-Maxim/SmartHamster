@@ -20,6 +20,8 @@ class Task(Base):
     who_appointed = relationship('Worker', foreign_keys=[who_appointed_id])
     whom_is_assigned = relationship('Worker', foreign_keys=[whom_is_assigned_id])
     task_group = relationship('Taskgroup', foreign_keys=[task_group_id])
+    cooperation_id = Column(Integer, ForeignKey('tasks.id'))
+    cooperation = relationship('Task', foreign_keys=[cooperation_id])
 
     def __repr__(self):
         return f'{self.id}/{self.worker}/{self.creation_date}/{self.completion_date}/' \

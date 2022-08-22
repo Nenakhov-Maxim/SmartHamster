@@ -40,7 +40,8 @@ class StartApp:
                  who_appointed: int = None,
                  whom_is_assigned: int = None,
                  task_group: int = 10,
-                 important: bool = False):
+                 important: bool = False,
+                 cooperation_id: int = None):
         new_task = Task(worker_id=worker_id,
                         text_task=text_task,
                         creation_date=datetime.datetime.now(),
@@ -50,7 +51,8 @@ class StartApp:
                         who_appointed_id=who_appointed,
                         whom_is_assigned_id=whom_is_assigned,
                         task_group_id=task_group,
-                        important=important)
+                        important=important,
+                        cooperation_id=cooperation_id)
         self.session.add(new_task)
         self.session.commit()
         return True
@@ -84,11 +86,14 @@ class StartApp:
                 result.append(parse_task)
             return result
         elif key == 'As':
-            pass
+            for it in self.session.query(Task).filter(and_(Task.worker_id == self.login_user,
+                                                           Task.status == 4)):
+                parse_task = self.parseTask(it)
+                result.append(parse_task)
+            return result
         elif key == 'At':
             for it in self.session.query(Task).filter(and_(Task.worker_id == self.login_user,
                                                            Task.status == 2)):
-                print(it)
                 parse_task = self.parseTask(it)
                 result.append(parse_task)
             return result
@@ -123,7 +128,7 @@ class StartApp:
     # Обновление данных
     def updating_task_data(self, ID, completion_date, text_task, who_appointed, whom_is_assigned,
                            task_group):
-        status = 3
+
         for it in self.session.query(Worker).filter(Worker.surname == who_appointed.split(' ')[0]):
             who_appointed = it.id
             break
@@ -131,11 +136,11 @@ class StartApp:
             who_appointed = None
         for it in self.session.query(Worker).filter(Worker.surname == whom_is_assigned.split(' ')[0]):
             whom_is_assigned = it.id
-            print(it.id)
             for it in self.session.query(Task).filter(Task.id == ID):
-                print(it.worker_id)
                 who_appointed = it.worker_id
-                status = 2
+                if it.status != 2:
+                    self.update_status(ID, 2)
+                    self.add_task(whom_is_assigned, text_task, 4, who_appointed=who_appointed, cooperation_id=ID)
             break
         else:
             whom_is_assigned = None
@@ -151,13 +156,48 @@ class StartApp:
              'text_task': text_task,
              'who_appointed_id': who_appointed,
              'whom_is_assigned_id': whom_is_assigned,
-             'task_group_id': task_group,
-             'status': status})
+             'task_group_id': task_group})
         self.session.commit()
 
     def update_important_task(self, ID, value: bool):
         self.session.query(Task).filter(Task.id == ID).update({'important': value})
         self.session.commit()
+
+    def update_status(self, ID, val):
+        task = self.session.query(Task).get(ID)
+        if task.cooperation_id == None:
+            self.session.query(Task).filter(Task.id == ID).update({'status': val})
+        else:
+            if val not in [1, 4]:
+                self.session.query(Task).filter(Task.id == ID).update({'status': val})
+                self.update_status(task.cooperation_id, val)
+            else:
+                match val:
+                    case 1:
+                        self.session.query(Task).filter(Task.id == ID).update({'status': val})
+                        self.update_status(task.cooperation_id, val)
+                    case 4:
+                        self.session.query(Task).filter(Task.id == ID).update({'status': val})
+                        self.update_status(task.cooperation_id, 2)
+
+
+
+        '''                          '''
+        if val not in [1, 3]:
+            self.session.query(Task).filter(Task.id == ID).update({'status': val})
+        else:
+            task = self.session.query(Task).get(ID)
+            if task.cooperation_id != None:
+                if val == 1:
+                    self.session.query(Task).filter(Task.id == ID).update({'status': val})
+                    self.update_status(task.cooperation_id, val)
+                elif val == 4:
+                    self.session.query(Task).filter(Task.id == ID).update({'status': val})
+                    self.update_status(task.cooperation_id, 2)
+            else:
+                self.session.query(Task).filter(Task.id == ID).update({'status': val})
+        self.session.commit()
+
 
     def delete_task(self, ID):
         self.session.query(Task).filter(Task.id == ID).update({'visibility': False})

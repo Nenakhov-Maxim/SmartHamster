@@ -6,7 +6,7 @@ app = StartApp()
 
 @eel.expose
 def start_app(key: str = 'P'):
-    user = app.find_user('32428')  #getpass.getuser() - в идеале через эту функцию!
+    user = app.find_user('32428')  #getpass.getuser() - в идеале через эту функцию! #33515, 32428
     if user is None:
         return ['Незарегистрированныйй пользователь', 'Неизвестный Email']
     else:
@@ -37,3 +37,7 @@ def del_task(ID):
 @eel.expose
 def get_workers():
     return app.info_workers()
+
+@eel.expose
+def update_st(ID, val):
+    app.update_status(ID, val)

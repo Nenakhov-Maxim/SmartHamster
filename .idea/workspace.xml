@@ -6,11 +6,10 @@
   <component name="ChangeListManager">
     <list default="true" id="67167fc0-ff12-4363-b3b0-19476aa52765" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/alarma.sqlite" beforeDir="false" afterPath="$PROJECT_DIR$/alarma.sqlite" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/alarma.sqlite" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/back/app.py" beforeDir="false" afterPath="$PROJECT_DIR$/back/app.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/front/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/front/index.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/back/data/tasks.py" beforeDir="false" afterPath="$PROJECT_DIR$/back/data/tasks.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/front/index.js" beforeDir="false" afterPath="$PROJECT_DIR$/front/index.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/front/style.css" beforeDir="false" afterPath="$PROJECT_DIR$/front/style.css" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/middle/middle.py" beforeDir="false" afterPath="$PROJECT_DIR$/middle/middle.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />

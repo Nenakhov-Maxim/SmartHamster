@@ -1,6 +1,7 @@
 
 //Определение базовых переменных
 let blockTask = document.getElementsByClassName('tasks-container')[0];
+let endTask = document.querySelector('.completed-task-inner');
 let inputBlock = document.getElementsByClassName('add-task')[0];
 let title = document.getElementsByClassName('title')[0]
 let applyOptionsButton = document.getElementsByClassName('modal-task-accept')[0];
@@ -34,9 +35,14 @@ for (let i = 0; i < document.querySelector('.group-task').childNodes.length; i++
     element.addEventListener('click', (e)=> {
       title.innerHTML = element.innerHTML;           
       document.querySelector('.active-nav').classList.remove('active-nav');
-      element.classList.add('active-nav');  
+      element.classList.add('active-nav');
       k = element.dataset.key;
       reloadTask(k);      
+      if(k == 'As' || k == 'At'){
+        document.querySelector('.add-task').style.display = 'None'  
+      }else{
+        document.querySelector('.add-task').style.display = 'block'
+      }      
     })     
   } 
 }
@@ -95,21 +101,28 @@ function inputBlur(self)  {
   self.style.transition = '.5s';
 }
 //Завершение задачи после выполнения (нажатие на круг слева)
-function completeTask(self) {
+function completeTask(div=self) {
   comp_div = document.getElementsByClassName('completed-task')[0];
   comp_elem = document.getElementsByClassName('completed-task-inner')[0];  
-  self.style.backgroundImage = 'url(icon/check.svg)';
-  self.style.backgroundPosition = '0.1vw -0.2vw';    
-  if(self.parentElement.classList.value == 'task'){
-    self.parentElement.classList.toggle('completed');
-    comp_elem.append(self.parentElement);
+  div.style.backgroundImage = 'url(icon/check.svg)';
+  div.style.backgroundPosition = '0.1vw -0.2vw';    
+  if(div.parentElement.classList.value == 'task'){    
+    div.parentElement.classList.toggle('completed');
+    comp_elem.append(div.parentElement);
     comp_div.style.display = 'block';    
-    self.parentElement.querySelector('.important-task').classList.add('delete');
-  } else {
-    self.parentElement.classList.toggle('completed');
-    self.parentElement.querySelector('.important-task').classList.remove('delete');
-    blockTask.append(self.parentElement);
-    self.style.backgroundImage = '';
+    div.parentElement.querySelector('.important-task').classList.add('delete');
+    updateStatus(div.parentElement.dataset.taskId, 1);
+  } else {    
+    div.parentElement.classList.toggle('completed');
+    div.parentElement.querySelector('.important-task').classList.remove('delete');
+    blockTask.append(div.parentElement);
+    div.style.backgroundImage = '';
+    active_nav = document.querySelector('.active-nav');
+    if(active_nav.dataset.key == 'As'){
+      updateStatus(div.parentElement.dataset.taskId, 4);
+    }else {
+      updateStatus(div.parentElement.dataset.taskId, 3);
+    }  
     if (document.querySelector('.completed') == null) {
       comp_div.style.display = 'None';
     };
@@ -154,7 +167,9 @@ async function send_new_data(ID, completion_date, text_task, who_appointed, whom
 }
 // Заполнение задач из БД
 function add_task_db(value) {
+    document.getElementsByClassName('completed-task')[0].style.display = 'none';
     blockTask.innerHTML = '';
+    endTask.innerHTML = '';
     for (let i = 0; i < value.length; i++) {    
       if (value[i][11] == "True") {
         let text_element = value[i][9];
@@ -182,8 +197,11 @@ function add_task_db(value) {
         div.setAttribute('data-status', (value[i][10] != 'None') ? value[i][10] : " ");        
         div.setAttribute('data-who-appointed', (value[i][12] != 'None') ? value[i][12] : " ");
         div.setAttribute('data-whom-is-assigned', (value[i][13] != 'None') ? value[i][13] : " ");
-        div.setAttribute('data-task-group', (value[i][14] != 'None') ? value[i][14] : " ");    
-        blockTask.append(div);        
+        div.setAttribute('data-task-group', (value[i][14] != 'None') ? value[i][14] : " ");
+        blockTask.append(div);
+        if (value[i][10] == 1) {                   
+          completeTask(div.querySelector('img'));  
+        }              
         div.querySelector('p.task-text').addEventListener('click', toggleTaskOptions);
         div.querySelector('.important-task').setAttribute('onclick', 'toggleCompleteAction(this)');
         if (value[i][15] == "True") {
@@ -204,13 +222,15 @@ async function deletedTask(ID){
 async function getUsers(){
   return await eel.get_workers()();
 }
+//Обновить статус задачи
+async function updateStatus(ID, val){
+  await eel.update_st(ID, val)()
+}
 //Обновление приложения
-async function reloadTask(key){
-  console.log(key)  
+async function reloadTask(key){  
   value = await eel.start_app(key)();
   add_task_db(value[1]);
-  active_nav = document.querySelector('.active-nav');
-  console.log(active_nav);
+  active_nav = document.querySelector('.active-nav');  
   document.querySelector('.active-nav').classList.remove('active-nav');  
   active_nav.classList.add('active-nav');
 }
