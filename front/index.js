@@ -161,14 +161,17 @@ async function get_data_by_groups(){
   return groups
 }
 //Отправка данных в базу данных
-async function send_new_data(ID, completion_date, text_task, who_appointed, whom_is_assigned, task_group){
-  await eel.update_all_data(ID, completion_date, text_task, who_appointed, whom_is_assigned, task_group)();
+async function send_new_data(ID, completion_date, text_task, who_appointed, whom_is_assigned, task_group, alarm, is_alarmed){
+  await eel.update_all_data(ID, completion_date, text_task, who_appointed, whom_is_assigned, task_group, alarm, is_alarmed)();
 }
 // Заполнение задач из БД
 function add_task_db(value) {
     document.getElementsByClassName('completed-task')[0].style.display = 'none';
     blockTask.innerHTML = '';
     endTask.innerHTML = '';
+    let idForAlarmClock = [];
+    let numberOfExpiredAlarmClocks = 0;
+    let textOfExpiredAlarmClocks = [];    
     for (let i = 0; i < value.length; i++) {    
       if (value[i][11] == "True") {
         let text_element = value[i][9];
@@ -203,11 +206,27 @@ function add_task_db(value) {
         }              
         div.querySelector('p.task-text').addEventListener('click', toggleTaskOptions);
         div.querySelector('.important-task').setAttribute('onclick', 'toggleCompleteAction(this)');
+        //Автоустановление важности задачи из базы данных
         if (value[i][15] == "True") {
           div.querySelector('.important-task').classList.add('star-on');
         };
+        // Автоустановление будильника из базы данных               
+        if (value[i][17] == 'False'){
+          if (value[i][16] != 'None') {
+            if (new Date(value[i][16]) < new Date()) {
+              numberOfExpiredAlarmClocks += 1;
+              textOfExpiredAlarmClocks.push(value[i][9]);
+              idForAlarmClock.push(value[i][0]);
+            } else {
+              setTimeout(alarmHorn, new Date(value[i][16]) - new Date(), [value[i][9]], 1, 'AT',  [value[i][0]]);
+            };
+          };
+        };
       };               
     };
+    if (numberOfExpiredAlarmClocks  > 0)  {
+      setTimeout(alarmHorn, 200, textOfExpiredAlarmClocks, numberOfExpiredAlarmClocks, 'AT', idForAlarmClock);
+    }
 };
 // Изменить важность задачи в бд
 async function updImportantTask(ID, impr){
@@ -233,9 +252,13 @@ async function reloadTask(key){
   document.querySelector('.active-nav').classList.remove('active-nav');  
   active_nav.classList.add('active-nav');
 }
+//Обновление будильника
+async function updateAlarmClock(ID, param){
+  await eel.upd_alarm_clock(ID, param)();
+}
 
 // Функция показать/скрыть опции задачи, формирование данных для блока настроек
-function toggleTaskOptions(self, event) {  
+function toggleTaskOptions(self) {  
   if (!modal.classList.contains('modal-active')) {
     modal.classList.add('modal-active');
   }   
@@ -291,7 +314,7 @@ function fieldset_change(self){
         }
         break;
       case 'horn':
-        console.log('Установить напоминание');
+        activatingAlarmClock();
         break;
       case 'repeat':
         console.log('Установить цикличность');
@@ -314,7 +337,7 @@ function fieldset_change(self){
           }
           break;
         case 'horn':
-          console.log('Убрать напоминание');
+          activatingAlarmClock();
           break;
         case 'repeat':
           console.log('Убарть цикличность');
@@ -339,12 +362,27 @@ applyOptionsButton.addEventListener('click', (e) => {
   let text =  document.querySelector('.modal-text').value
   let who_appointed = document.querySelector('input.option-assign').value;
   let whom_is_assigned = document.querySelector('input.option-to-assign').value;
-  let task_group = document.querySelector("select.modal-option-select").value;  
+  let task_group = document.querySelector("select.modal-option-select").value;
+  let horn_date = document.querySelector("#horn-date").value;
+  let horn_time = document.querySelector("#horn-time").value;
+  let alarm = '';
+  let is_alarmed = 0
+  if (horn_date != '' && horn_time == ''){
+    alarm = horn_date + ' 23:59';
+  } else if (horn_date == '' && horn_time != ''){
+    alarm = formatDate(new Date())[0] + ' ' + horn_time;
+  } else if (horn_date != '' && horn_time != ''){
+      alarm = horn_date + ' ' + horn_time;
+  } else {
+    is_alarmed = 1
+  }
+     
   //Отправка данных в базу данных
-  send_new_data(ID, completion_date + ' ' + completion_time, text, who_appointed, whom_is_assigned, task_group); //creation_date
+  send_new_data(ID, completion_date + ' ' + completion_time, text, who_appointed, whom_is_assigned, task_group, alarm, is_alarmed); //creation_date
   modal.classList.remove('modal-active');
   k = document.querySelector('.active-nav').dataset.key;  
   reloadTask(k);
+  // setTimeout(alarmHorn, new Date(alarm) - new Date(), [text], 1, 'AT')
 });
 
 //Автокомплит для назначения ответственных (библиотека jquery)
@@ -398,19 +436,65 @@ newListTask.addEventListener('click', () => {
       newListTask.style.display = 'grid';
     }
   }); 
-  
- document.querySelector('.list-task-name').addEventListener('keypress', (e)=>{
-  if (e.key === 'Enter') {
-    modal_list.style.display = 'none';
-    newListTask.style.display = 'grid';
-    new_div = document.createElement('div');
-    new_div.classList.add('list-task');
-    new_div.innerHTML = document.querySelector('.list-task-name').value;
-    document.querySelector('.list-task-inner').append(new_div);
-    document.querySelector('.list-task-name').value = '';
-  }
- })  
+  // Снятие фокуса с окна создания нового списка
+  document.querySelector('.list-task-name').addEventListener('keypress', (e)=>{
+    if (e.key === 'Enter') {
+      modal_list.style.display = 'none';
+      newListTask.style.display = 'grid';
+      new_div = document.createElement('div');
+      new_div.classList.add('list-task');
+      new_div.innerHTML = document.querySelector('.list-task-name').value;
+      document.querySelector('.list-task-inner').append(new_div);
+      document.querySelector('.list-task-name').value = '';
+    };
+  });
 });
+
+//Установка напоминаня в окне "Настройка задачи"
+function activatingAlarmClock(){
+  horn_input = document.querySelector('.horn-input')
+  if(horn_input.classList.contains('active')){
+    horn_input.classList.remove('active');
+  }else {
+    horn_input.classList.add('active');
+  }
+}
+
+// Функция всплывающая при наступлении времени будильника
+// text - текст задачи, col - количество уведомлений, param:
+// AT - Уведомление будильника
+function alarmHorn(text, col, param, ID){
+  document.querySelector('.modal-horn').classList.add('active');
+  modal_alarm = document.querySelector('.modal-horn-layout');
+  modal_alarm.innerHTML = '';
+    if (param == 'AT'){  
+      h3 = document.createElement('h3');
+      if (col == 1) {
+        h3.innerHTML = `У вас ${col} новое уведомление`;
+      }else  {
+        h3.innerHTML = `У вас ${col} новых уведомлений`;
+      }
+      modal_alarm.append(h3);
+      alarm_div = document.createElement('div');
+      alarm_div.classList.add('horned-task');   
+      alarm_p = document.createElement('p');
+      alarm_p.innerHTML = 'Напоминание о выполнение задачи:';
+      alarm_div.append(alarm_p);
+      alarm_ul = document.createElement('ul');         
+      for (let i = 0; i < text.length; i++) {
+        const element = text[i];         
+        alarm_li = document.createElement('li');        
+        alarm_li.innerHTML = `<li>${element}</li>`
+        alarm_ul.append(alarm_li);
+      }
+      alarm_div.append(alarm_ul);
+      modal_alarm.append(alarm_div);
+    }
+    document.querySelector('.modal-horn-exit').addEventListener('click', ()=> {
+      document.querySelector('.modal-horn').classList.remove('active');
+      updateAlarmClock(ID, 1);
+    });  
+  }
 
 //Запуск приложения
 start_app();

@@ -573,6 +573,29 @@ input#search {
   margin-right: 5px;
 }
 
+.horn-input {
+  display: none;
+  margin: 10px;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+}
+
+
+
+#horn-date {  
+  margin-right: 13px;
+  text-align: left;
+  margin-bottom: 10px;
+  transform: scale(1.0);
+}
+#horn-time {  
+  margin-right: 13px;
+  text-align: left;
+  margin-bottom: 10px;
+  transform: scale(1.0);
+}
+
 /*конопка принять изменения в опциях задачи*/
 .modal-task-accept {
   border-radius: 4px;
@@ -601,5 +624,43 @@ input#search {
   background-color: rgb( 75, 183, 141 );
 }
 
+.modal-horn {
+  display: none;
+  justify-content: center;
+  align-items: center;
+  width: 100vw;
+  height: 100vh;
+  background-color: black;
+  opacity: .75;
+  position: absolute;
+}
 
+.modal-horn-inner {
+  position: relative;
+  width: 400px;
+  height: 500px;
+  background-color: white;
+  text-align: center; 
+}
 
+.modal-horn-exit {
+  position: absolute;
+  position: absolute;
+  right: 0px;
+  top: -30px;
+  color: white;
+}
+
+.modal-horn-exit:hover { 
+  cursor: pointer;
+  font-size: 25px;
+  
+}
+
+li {
+  text-align: left;
+}
+
+.active  {
+  display: flex;  
+}

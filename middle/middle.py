@@ -23,8 +23,8 @@ def get_groups():
     result = app.get_groups()
     return result
 @eel.expose
-def update_all_data(ID, completion_date, text_task, who_appointed, whom_is_assigned, task_group):
-    app.updating_task_data(ID, completion_date, text_task, who_appointed, whom_is_assigned, task_group)
+def update_all_data(ID, completion_date, text_task, who_appointed, whom_is_assigned, task_group, alarm, is_alarmed):
+    app.updating_task_data(ID, completion_date, text_task, who_appointed, whom_is_assigned, task_group, alarm, is_alarmed)
 
 @eel.expose
 def update_important(ID, impr):
@@ -41,3 +41,7 @@ def get_workers():
 @eel.expose
 def update_st(ID, val):
     app.update_status(ID, val)
+
+@eel.expose
+def upd_alarm_clock(ID, param):
+    app.update_alarm_clock(ID, param)

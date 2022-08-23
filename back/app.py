@@ -41,7 +41,9 @@ class StartApp:
                  whom_is_assigned: int = None,
                  task_group: int = 10,
                  important: bool = False,
-                 cooperation_id: int = None):
+                 cooperation_id: int = None,
+                 alarm_time=None,
+                 is_alarmed: bool = True):
         new_task = Task(worker_id=worker_id,
                         text_task=text_task,
                         creation_date=datetime.datetime.now(),
@@ -52,7 +54,9 @@ class StartApp:
                         whom_is_assigned_id=whom_is_assigned,
                         task_group_id=task_group,
                         important=important,
-                        cooperation_id=cooperation_id)
+                        cooperation_id=cooperation_id,
+                        alarm_time=alarm_time,
+                        is_alarmed=is_alarmed)
         self.session.add(new_task)
         self.session.commit()
         return True
@@ -67,7 +71,6 @@ class StartApp:
 
     def get_tasks(self, key: str = 'P'):
         result = []
-        print(key)
         if key == 'P':
             for it in self.session.query(Task).filter(Task.worker_id == self.login_user):
                 parse_task = self.parseTask(it)
@@ -114,9 +117,12 @@ class StartApp:
         user_group = it.worker.group.group_name
         user_group_id = it.worker.group.id
         user_id = it.worker.id
+        alarm = it.alarm_time
+        is_alarmed = it.is_alarmed
         task = [str(it.id), user_name, user_email, user_number, user_group, str(user_group_id), str(user_id),
                 str(it.creation_date), str(it.completion_date), it.text_task, it.status,
-                str(it.visibility), who_appointed, whom_is_assigned, str(it.task_group), str(it.important)]
+                str(it.visibility), who_appointed, whom_is_assigned, str(it.task_group), str(it.important), str(alarm),
+                str(is_alarmed)]
         return task
 
     def get_groups(self):
@@ -127,7 +133,7 @@ class StartApp:
 
     # Обновление данных
     def updating_task_data(self, ID, completion_date, text_task, who_appointed, whom_is_assigned,
-                           task_group):
+                           task_group, alarm, is_alarmed):
 
         for it in self.session.query(Worker).filter(Worker.surname == who_appointed.split(' ')[0]):
             who_appointed = it.id
@@ -152,12 +158,23 @@ class StartApp:
             completion_date = None
         else:
             completion_date = datetime.datetime.strptime(completion_date, '%Y-%m-%d %H:%M')
+        if alarm == '':
+            alarm = None
+        else:
+            alarm = datetime.datetime.strptime(alarm, '%Y-%m-%d %H:%M')
+        if is_alarmed == 0:
+            is_alarmed = False
+        else:
+            is_alarmed = True
+
         self.session.query(Task).filter(Task.id == ID).update(
             {'completion_date': completion_date,
              'text_task': text_task,
              'who_appointed_id': who_appointed,
              'whom_is_assigned_id': whom_is_assigned,
-             'task_group_id': task_group})
+             'task_group_id': task_group,
+             'alarm_time': alarm,
+             'is_alarmed': is_alarmed})
         self.session.commit()
 
     def update_important_task(self, ID, value: bool):
@@ -203,4 +220,12 @@ class StartApp:
     def delete_task(self, ID):
         self.session.query(Task).filter(Task.id == ID).update({'visibility': False})
         self.session.commit()
+
+    def update_alarm_clock(self, ID, param):
+        for id in ID:
+            if param == 1:
+                self.session.query(Task).filter(Task.id == int(id)).update({'is_alarmed': True})
+            else:
+                self.session.query(Task).filter(Task.id == int(id)).update({'is_alarmed': False})
+            self.session.commit()
 

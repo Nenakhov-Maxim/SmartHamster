@@ -132,6 +132,10 @@
                 <div class="modal-suboption">
                   <input type="checkbox" class="modal-task-checkbox horn" name="horn" onclick="fieldset_change(this)">
                   <label for="horn">Установить напоминание?</label>
+                  <div class="horn-input">                    
+                    <input id="horn-date" type="date" name="horn-time">
+                    <input id="horn-time" type="time" name="horn-time">
+                  </div>
                 </div>
                 <div class="modal-suboption">
                   <input type="checkbox" class="modal-task-checkbox repeat" name="repeat" onclick="fieldset_change(this)">
@@ -148,6 +152,21 @@
         </div>      
       </div>
     </section>
+    <div class="modal-horn">
+      <div class="modal-horn-inner"> 
+        <!-- onclick="modalHornClose(this)" -->
+        <div class="modal-horn-exit" >X</div>              
+        <div class="modal-horn-layout">
+          <!-- <h3>У вас 1 новое уведомление</h3>
+          <div class="horned-task">
+            <p>Напоминание о выполнение задачи:</p>
+            <ul>
+              <li>Задача 1</li>
+            </ul>
+          </div>         -->
+        </div>
+      </div>
+    </div>
   </div>
   <script src="index.js"></script>  
 </body>

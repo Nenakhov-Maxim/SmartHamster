@@ -16,6 +16,8 @@ class Task(Base):
     who_appointed_id = Column(Integer, ForeignKey('workers.id'))
     whom_is_assigned_id = Column(Integer, ForeignKey('workers.id'))
     task_group_id = Column(Integer, ForeignKey('taskgroup.id'))
+    alarm_time = Column(TIMESTAMP)
+    is_alarmed = Column(Boolean)
     worker = relationship('Worker', foreign_keys=[worker_id])
     who_appointed = relationship('Worker', foreign_keys=[who_appointed_id])
     whom_is_assigned = relationship('Worker', foreign_keys=[whom_is_assigned_id])
@@ -23,10 +25,12 @@ class Task(Base):
     cooperation_id = Column(Integer, ForeignKey('tasks.id'))
     cooperation = relationship('Task', foreign_keys=[cooperation_id])
 
+
     def __repr__(self):
         return f'{self.id}/{self.worker}/{self.creation_date}/{self.completion_date}/' \
                f'{self.text_task}/{self.status}/{self.visibility}/{self.who_appointed_id}/' \
                f'{self.whom_is_assigned}/' \
-               f'{self.task_group}/{self.important}'
+               f'{self.task_group}/{self.important}/' \
+               f'{self.alarm_time}'
 
 
