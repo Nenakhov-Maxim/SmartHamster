@@ -140,7 +140,8 @@ class StartApp:
                 who_appointed = it.worker_id
                 if it.status != 2:
                     self.update_status(ID, 2)
-                    self.add_task(whom_is_assigned, text_task, 4, who_appointed=who_appointed, cooperation_id=ID)
+                    self.add_task(whom_is_assigned, text_task, 4, who_appointed=who_appointed, cooperation_id=ID,
+                                  completion_date=datetime.datetime.strptime(completion_date, '%Y-%m-%d %H:%M'))
             break
         else:
             whom_is_assigned = None

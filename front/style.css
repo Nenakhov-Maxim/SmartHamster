@@ -203,6 +203,7 @@ body {
 }
 
 .list-task-container {
+  position: relative;
   display: grid;
   grid-template-rows: auto 5vh;  
   padding: 5px;
@@ -210,13 +211,38 @@ body {
 .list-task {
   display: grid;
 }
-.new-task {
+.new-list-task {
   display: grid;
   align-items: center;
 }
 
-.new-task:hover {
+.new-list-task:hover {
   cursor: pointer;
+}
+
+.list-task-name {
+  width: 250px;
+  height: 35px;
+  padding: 5px;
+  font-size: 18px
+}
+
+.modal-list-task{
+  display: none;
+  flex-wrap: wrap;
+  position: absolute;
+  bottom: 100px;
+  align-items: center;
+  right: -200px;
+  width: 400px;
+  height: 150px;
+  background-color: rgb(0,50,116, 0.75);
+  justify-content: space-around;  
+  z-index: 1;
+  font-size: 25px;
+  border-radius: 10px;
+  border: 3px solid black;
+  color: white;
 }
 
 .box-task {

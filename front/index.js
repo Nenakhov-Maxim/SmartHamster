@@ -9,8 +9,7 @@ let applyOptionsButton = document.getElementsByClassName('modal-task-accept')[0]
 //Обновление по нажатию кнопки f5
 document.addEventListener('keydown', (e)=> {
   if (e.keyCode == 116) {
-    e.preventDefault();
-    console.log('F5 pressed')  
+    e.preventDefault();     
   }
 })
 
@@ -236,7 +235,7 @@ async function reloadTask(key){
 }
 
 // Функция показать/скрыть опции задачи, формирование данных для блока настроек
-function toggleTaskOptions(self, event) {
+function toggleTaskOptions(self, event) {  
   if (!modal.classList.contains('modal-active')) {
     modal.classList.add('modal-active');
   }   
@@ -343,10 +342,8 @@ applyOptionsButton.addEventListener('click', (e) => {
   let task_group = document.querySelector("select.modal-option-select").value;  
   //Отправка данных в базу данных
   send_new_data(ID, completion_date + ' ' + completion_time, text, who_appointed, whom_is_assigned, task_group); //creation_date
-  console.log('изменения приняты');
   modal.classList.remove('modal-active');
-  k = document.querySelector('.active-nav').dataset.key;
-  console.log(k) 
+  k = document.querySelector('.active-nav').dataset.key;  
   reloadTask(k);
 });
 
@@ -388,6 +385,32 @@ function formatDate(val){
   refTime = `${hour}:${minute}`;
   return [refDate, refTime];
 }
+
+//Создать новый список
+newListTask = document.querySelector('.new-list-task');
+newListTask.addEventListener('click', () => {
+ newListTask.style.display = 'none';
+ modal_list = document.querySelector('.modal-list-task');
+ modal_list.style.display = 'flex';
+ document.addEventListener('click', (e)=>{    
+    if (modal_list.style.display == 'flex' && !e.target.classList.contains('new-list-task') && !e.path.includes(modal_list)) {    
+      modal_list.style.display = 'none';
+      newListTask.style.display = 'grid';
+    }
+  }); 
+  
+ document.querySelector('.list-task-name').addEventListener('keypress', (e)=>{
+  if (e.key === 'Enter') {
+    modal_list.style.display = 'none';
+    newListTask.style.display = 'grid';
+    new_div = document.createElement('div');
+    new_div.classList.add('list-task');
+    new_div.innerHTML = document.querySelector('.list-task-name').value;
+    document.querySelector('.list-task-inner').append(new_div);
+    document.querySelector('.list-task-name').value = '';
+  }
+ })  
+});
 
 //Запуск приложения
 start_app();
