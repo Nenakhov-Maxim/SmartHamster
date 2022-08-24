@@ -183,6 +183,7 @@ function add_task_db(value) {
         div.innerHTML = `<img src="icon/circle.svg" alt="выполнено" onclick="completeTask(this)">
                         <p class='task-text'>${text_element}</p>
                         <div class="important-task"></div>
+                        <div class="alarmed-task"></div>
                         <div class="sub-startdate-task"><p>Создано: ${value[i][7].split(' ')[0]}</p></div>
                         <div class="sub-enddate-task">
                         <p>Закончить: ${value[i][8].split(' ')[0]}</p>
@@ -219,6 +220,7 @@ function add_task_db(value) {
               idForAlarmClock.push(value[i][0]);
             } else {
               setTimeout(alarmHorn, new Date(value[i][16]) - new Date(), [value[i][9]], 1, 'AT',  [value[i][0]]);
+              div.querySelector('.alarmed-task').classList.add('alarm');
             };
           };
         };
@@ -493,8 +495,17 @@ function alarmHorn(text, col, param, ID){
     document.querySelector('.modal-horn-exit').addEventListener('click', ()=> {
       document.querySelector('.modal-horn').classList.remove('active');
       updateAlarmClock(ID, 1);
+      for (const id in ID) {
+        if (Object.hasOwnProperty.call(ID, id)) {
+          const element = ID[id];
+          task = document.querySelector('.task[data-task-id="'+element+'"]');
+          if (task.querySelector('.alarmed-task').classList.contains('alarm')) {
+            task.querySelector('.alarmed-task').classList.remove('alarm');
+          }; 
+        };
+      };
     });  
-  }
+  };
 
 //Запуск приложения
 start_app();

@@ -312,6 +312,23 @@ body {
   transition: all .4s;
 }
 
+.alarmed-task {
+  display: none;
+  position: absolute;
+  content: '';
+  background-image: url(icon/bell.svg);  
+  background-repeat: no-repeat;
+  background-size: cover;
+  width: 30px;
+  height: 30px;
+  right: 6vw;
+  transition: all .4s;  
+}
+
+.alarm {
+  display: block;
+}
+
 .sub-startdate-task {
   position: absolute;
   display: flex;
