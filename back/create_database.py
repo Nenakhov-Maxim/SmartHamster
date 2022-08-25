@@ -4,6 +4,7 @@ from back.data.workers import Worker
 from back.data.workgroup import Workgroup
 from back.data.task_group import Taskgroup
 from back.data.status import Status
+from back.data.сustom_lists import CustomList
 import datetime
 
 def create_dabase(load_data: bool =  True):
@@ -67,6 +68,9 @@ def _load_data(session: Session):
     worker2 = Worker('TEST TEST TEST'.split(' '), group2.id, False, 'test@imf.ru', '33515')
     session.add(worker1)
     session.add(worker2)
+    session.commit()
+    custom_list = CustomList(list_name='Мой первый список', worker_id=1)
+    session.add(custom_list)
     session.commit()
     # new_task1 = Task(worker_id=worker1.id, text_task='Сделать базу данных', creation_date=datetime.datetime.now(), task_group_id=task_gr10.id)
     # new_task2 = Task(worker_id=worker2.id, text_task='Другая задача', creation_date=datetime.datetime.now(),

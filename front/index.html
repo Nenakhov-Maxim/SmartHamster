@@ -66,7 +66,7 @@
         </div>
         <div class="task" data-task-text="12312" data-task-id="1" data-creation-date="2022-08-10 00:00:00" data-completion-date="" data-status="1" data-visibillity="True" data-who-appointed=" " data-whom-is-assigned=" " data-task-group="Экология"><img src="icon/circle.svg" alt="выполнено" onclick="completeTask(this)"><p class="task-text">12312</p>
           <div class="important-task" onclick="toggleCompleteAction(this)"></div>
-          <div class="alarmed-task"></div>
+          <div class="alarmed-task"></div>          
           <div class="sub-startdate-task"><p>Создано: 2022-08-20</p></div>
           <div class="sub-enddate-task"><p>Закончить: 2022-08-19</p></div>
         </div>
@@ -145,6 +145,16 @@
                 <div class="modal-suboption">
                   <input type="checkbox" class="modal-task-checkbox assign" name="assign" onclick="fieldset_change(this)">
                   <label for="assign">Назначить ответственного?</label>
+                </div>
+                <div class="modal-suboption">
+                  <input type="checkbox" class="modal-task-checkbox move-to-my-list" name="move-to-my-list" onclick="fieldset_change(this)">
+                  <label for="move-to-my-list">Перенести в собственный список?</label>
+                  <div class="move-to-my-list-inner">                    
+                    <select class="move-to-my-list-select" name="move-to-my-list-select">
+                      <option>Пункт 1</option>
+                      <option>Пункт 2</option>
+                    </select>    
+                  </div>
                 </div>               
               </fieldset>
             </div>

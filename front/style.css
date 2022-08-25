@@ -208,9 +208,16 @@ body {
   grid-template-rows: auto 5vh;  
   padding: 5px;
 }
+
 .list-task {
   display: grid;
+  padding: 5px;
 }
+
+.list-task:hover {
+  cursor: pointer;
+}
+
 .new-list-task {
   display: grid;
   align-items: center;
@@ -678,6 +685,20 @@ li {
   text-align: left;
 }
 
+.move-to-my-list-inner {
+display: none;
+}
+
 .active  {
   display: flex;  
+}
+
+.move-to-my-list-select {
+  width: 15vw;
+  font-size: 13px;
+  padding: 6px 0 4px 10px;
+  border: 1px solid #cecece;
+  background: #F6F6f6;
+  border-radius: 8px;
+  box-sizing: border-box;
 }

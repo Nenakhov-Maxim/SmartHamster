@@ -5,6 +5,7 @@ let endTask = document.querySelector('.completed-task-inner');
 let inputBlock = document.getElementsByClassName('add-task')[0];
 let title = document.getElementsByClassName('title')[0]
 let applyOptionsButton = document.getElementsByClassName('modal-task-accept')[0];
+let worker_ident = 0
 
 //Обновление по нажатию кнопки f5
 document.addEventListener('keydown', (e)=> {
@@ -131,10 +132,16 @@ function completeTask(div=self) {
 //Функции для связи с backend
 // Запуск приложения (поиск пользователя в БД, заполнение профиля (имя, почта), заполнение задач из БД)
 async function start_app(key='P'){  
-    value = await eel.start_app(key)();      
-    log_up(value[0][0])
-    email_up(value[0][1])
-    add_task_db(value[1])  
+    value = await eel.start_app(key)();         
+    log_up(value[0][0]);
+    email_up(value[0][1]);
+    //Добавляем задачи из баз
+    add_task_db(value[1]);
+    //Добавляем из базы собственные созданные списки
+    let worker_ID = value[0][5];
+    worker_ident = value[0][5];
+    get_custom_list(worker_ID);
+
 }
 //Заполнение профиля. Имя
 function log_up(user_name) {
@@ -155,14 +162,25 @@ async function add_to_database(text){
     console.log('Что-то пошло не так')
   }
 }
+
+async function get_custom_list(worker_ID) {
+  result = await eel.get_task_list(worker_ID)();  
+  add_custom_list(result);  
+}
+
 // Получение групп задач для заполнения select в блоке опции
 async function get_data_by_groups(){  
   groups = await eel.get_groups()();  
   return groups
 }
 //Отправка данных в базу данных
-async function send_new_data(ID, completion_date, text_task, who_appointed, whom_is_assigned, task_group, alarm, is_alarmed){
-  await eel.update_all_data(ID, completion_date, text_task, who_appointed, whom_is_assigned, task_group, alarm, is_alarmed)();
+async function send_new_data(ID, completion_date, text_task, who_appointed, whom_is_assigned, task_group, alarm, is_alarmed, task_list){
+  await eel.update_all_data(ID, completion_date, text_task, who_appointed, whom_is_assigned, task_group, alarm, is_alarmed, task_list)();
+}
+
+//Добавление нового пользовательского списка в бд
+async function addNewCustomList(val){
+  await eel.add_task_list(val)();
 }
 // Заполнение задач из БД
 function add_task_db(value) {
@@ -229,6 +247,8 @@ function add_task_db(value) {
     if (numberOfExpiredAlarmClocks  > 0)  {
       setTimeout(alarmHorn, 200, textOfExpiredAlarmClocks, numberOfExpiredAlarmClocks, 'AT', idForAlarmClock);
     }
+    
+
 };
 // Изменить важность задачи в бд
 async function updImportantTask(ID, impr){
@@ -247,8 +267,8 @@ async function updateStatus(ID, val){
   await eel.update_st(ID, val)()
 }
 //Обновление приложения
-async function reloadTask(key){  
-  value = await eel.start_app(key)();
+async function reloadTask(key, custom_list=''){  
+  value = await eel.start_app(key, custom_list)();
   add_task_db(value[1]);
   active_nav = document.querySelector('.active-nav');  
   document.querySelector('.active-nav').classList.remove('active-nav');  
@@ -324,6 +344,9 @@ function fieldset_change(self){
       case 'assign':
         whomIsAssigned.removeAttribute('readonly');
         break;
+      case 'move-to-my-list':
+        document.querySelector('.move-to-my-list-inner').classList.add('active');
+        break;    
       default:
         break;
     }
@@ -347,6 +370,9 @@ function fieldset_change(self){
         case 'assign':
           whomIsAssigned.setAttribute('readonly', 'readonly');
           break;
+        case 'move-to-my-list':
+          document.querySelector('.move-to-my-list-inner').classList.remove('active');
+          break;   
         default:
           break;
       };  
@@ -376,15 +402,19 @@ applyOptionsButton.addEventListener('click', (e) => {
   } else if (horn_date != '' && horn_time != ''){
       alarm = horn_date + ' ' + horn_time;
   } else {
-    is_alarmed = 1
+    is_alarmed = 1;
   }
-     
+  let task_list = '';
+  if (document.querySelector('.move-to-my-list').checked) {
+    task_list = document.querySelector('.move-to-my-list-select').value;
+  } 
   //Отправка данных в базу данных
-  send_new_data(ID, completion_date + ' ' + completion_time, text, who_appointed, whom_is_assigned, task_group, alarm, is_alarmed); //creation_date
+  send_new_data(ID, completion_date + ' ' + completion_time, text, who_appointed, whom_is_assigned, task_group, alarm, is_alarmed, task_list); //creation_date
   modal.classList.remove('modal-active');
-  k = document.querySelector('.active-nav').dataset.key;  
+  k = document.querySelector('.active-nav').dataset.key;
+  
   reloadTask(k);
-  // setTimeout(alarmHorn, new Date(alarm) - new Date(), [text], 1, 'AT')
+  
 });
 
 //Автокомплит для назначения ответственных (библиотека jquery)
@@ -426,7 +456,7 @@ function formatDate(val){
   return [refDate, refTime];
 }
 
-//Создать новый список
+// Снятие фокуса с окна создания нового списка
 newListTask = document.querySelector('.new-list-task');
 newListTask.addEventListener('click', () => {
  newListTask.style.display = 'none';
@@ -438,7 +468,8 @@ newListTask.addEventListener('click', () => {
       newListTask.style.display = 'grid';
     }
   }); 
-  // Снятие фокуса с окна создания нового списка
+
+  //Создать новый список
   document.querySelector('.list-task-name').addEventListener('keypress', (e)=>{
     if (e.key === 'Enter') {
       modal_list.style.display = 'none';
@@ -446,8 +477,10 @@ newListTask.addEventListener('click', () => {
       new_div = document.createElement('div');
       new_div.classList.add('list-task');
       new_div.innerHTML = document.querySelector('.list-task-name').value;
+      addNewCustomList(document.querySelector('.list-task-name').value);
       document.querySelector('.list-task-inner').append(new_div);
       document.querySelector('.list-task-name').value = '';
+      
     };
   });
 });
@@ -462,7 +495,7 @@ function activatingAlarmClock(){
   }
 }
 
-// Функция всплывающая при наступлении времени будильника
+// Функция - действие при наступлении времени будильника
 // text - текст задачи, col - количество уведомлений, param:
 // AT - Уведомление будильника
 function alarmHorn(text, col, param, ID){
@@ -507,5 +540,28 @@ function alarmHorn(text, col, param, ID){
     });  
   };
 
+//Добавление собственных списков задач, подгруженных из базы данных
+function add_custom_list(value){
+  option_task = document.querySelector('.move-to-my-list-select');
+  option_task.innerHTML = '';  
+  for (const key in value) {
+    if (Object.hasOwnProperty.call(value, key)) {
+      const element = value[key];
+      new_div = document.createElement('div');
+      new_div.classList.add('list-task');      
+      new_div.innerHTML = element;
+      document.querySelector('.list-task-inner').append(new_div);
+      new_option = document.createElement('option');
+      new_option.innerHTML = element;
+      option_task.append(new_option);
+      new_div.addEventListener('click', (e)=>{        
+        document.querySelector('.active-nav').classList.remove('active-nav');
+        e.target.classList.add('active-nav');
+        title.innerHTML = e.target.innerHTML;
+        reloadTask('CT', custom_list=e.target.innerHTML);
+      })
+    };
+  };
+};  
 //Запуск приложения
 start_app();

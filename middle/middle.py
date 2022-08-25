@@ -5,12 +5,12 @@ from back.app import StartApp
 app = StartApp()
 
 @eel.expose
-def start_app(key: str = 'P'):
+def start_app(key: str = 'P', custom_list: str = ''):
     user = app.find_user('32428')  #getpass.getuser() - в идеале через эту функцию! #33515, 32428
     if user is None:
         return ['Незарегистрированныйй пользователь', 'Неизвестный Email']
     else:
-        tasks = app.get_tasks(key)
+        tasks = app.get_tasks(key, custom_list)
         return user, tasks
 
 @eel.expose
@@ -23,8 +23,8 @@ def get_groups():
     result = app.get_groups()
     return result
 @eel.expose
-def update_all_data(ID, completion_date, text_task, who_appointed, whom_is_assigned, task_group, alarm, is_alarmed):
-    app.updating_task_data(ID, completion_date, text_task, who_appointed, whom_is_assigned, task_group, alarm, is_alarmed)
+def update_all_data(ID, completion_date, text_task, who_appointed, whom_is_assigned, task_group, alarm, is_alarmed, task_list):
+    app.updating_task_data(ID, completion_date, text_task, who_appointed, whom_is_assigned, task_group, alarm, is_alarmed, task_list)
 
 @eel.expose
 def update_important(ID, impr):
@@ -45,3 +45,11 @@ def update_st(ID, val):
 @eel.expose
 def upd_alarm_clock(ID, param):
     app.update_alarm_clock(ID, param)
+
+@eel.expose
+def add_task_list(val):
+    app.add_task_list(val)
+
+@eel.expose
+def get_task_list(worker_ID):
+    return app.get_task_list(worker_ID)

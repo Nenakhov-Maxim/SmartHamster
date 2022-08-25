@@ -5,6 +5,7 @@ from back.data.tasks import Task
 from back.data.workers import Worker
 from back.data.workgroup import Workgroup
 from back.data.task_group import Taskgroup
+from back.data.сustom_lists import CustomList
 from back.data.database import DATABASE_NAME, Session
 import back.create_database as db_creater
 
@@ -69,7 +70,7 @@ class StartApp:
         else:
             return None
 
-    def get_tasks(self, key: str = 'P'):
+    def get_tasks(self, key: str = 'P', custom_list: str = ''):
         result = []
         if key == 'P':
             for it in self.session.query(Task).filter(Task.worker_id == self.login_user):
@@ -100,6 +101,16 @@ class StartApp:
                 parse_task = self.parseTask(it)
                 result.append(parse_task)
             return result
+        elif key == 'CT':
+            custom_id = 0
+            result = []
+            for it in self.session.query(CustomList).filter(CustomList.list_name == custom_list):
+                custom_id = it.id
+            for it in self.session.query(Task).filter(Task.custom_list_id == custom_id):
+                result.append(self.parseTask(it))
+            return result
+
+
     def parseTask(self, it):
         who_appointed = ''
         whom_is_assigned = ''
@@ -119,10 +130,11 @@ class StartApp:
         user_id = it.worker.id
         alarm = it.alarm_time
         is_alarmed = it.is_alarmed
+        task_list = it.custom_list
         task = [str(it.id), user_name, user_email, user_number, user_group, str(user_group_id), str(user_id),
                 str(it.creation_date), str(it.completion_date), it.text_task, it.status,
                 str(it.visibility), who_appointed, whom_is_assigned, str(it.task_group), str(it.important), str(alarm),
-                str(is_alarmed)]
+                str(is_alarmed), str(task_list)]
         return task
 
     def get_groups(self):
@@ -133,7 +145,7 @@ class StartApp:
 
     # Обновление данных
     def updating_task_data(self, ID, completion_date, text_task, who_appointed, whom_is_assigned,
-                           task_group, alarm, is_alarmed):
+                           task_group, alarm, is_alarmed, task_list):
 
         for it in self.session.query(Worker).filter(Worker.surname == who_appointed.split(' ')[0]):
             who_appointed = it.id
@@ -166,6 +178,11 @@ class StartApp:
             is_alarmed = False
         else:
             is_alarmed = True
+        if task_list != '':
+            for it in self.session.query(CustomList).filter(CustomList.list_name == task_list):
+                task_list = it.id
+        else:
+            task_list = None
 
         self.session.query(Task).filter(Task.id == ID).update(
             {'completion_date': completion_date,
@@ -174,7 +191,8 @@ class StartApp:
              'whom_is_assigned_id': whom_is_assigned,
              'task_group_id': task_group,
              'alarm_time': alarm,
-             'is_alarmed': is_alarmed})
+             'is_alarmed': is_alarmed,
+             'custom_list_id': task_list})
         self.session.commit()
 
     def update_important_task(self, ID, value: bool):
@@ -228,4 +246,15 @@ class StartApp:
             else:
                 self.session.query(Task).filter(Task.id == int(id)).update({'is_alarmed': False})
             self.session.commit()
+
+    def add_task_list(self, val):
+        new_custom_list = CustomList(list_name=val, worker_id=self.login_user)
+        self.session.add(new_custom_list)
+        self.session.commit()
+
+    def get_task_list(self, worker_ID):
+        result = []
+        for it in self.session.query(CustomList).filter(CustomList.worker_id == worker_ID):
+            result.append(it.list_name)
+        return result
 
